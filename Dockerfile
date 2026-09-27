@@ -18,6 +18,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Loyiha fayllarini nusxalash
 COPY . .
 
+# Python yo'li va sozlamalari
+ENV PYTHONPATH="/app"
+ENV PYTHONUNBUFFERED=1
+
 # Xavfsizlik uchun maxsus portni ochamiz
 EXPOSE 8000
 
