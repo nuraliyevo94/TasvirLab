@@ -1466,8 +1466,8 @@ function drawKaraokeSubtitle(c, chunk, x, y, maxWidth, maxHeight, isHighlighted)
   let lineHeight = fontSize + 8;
   c.font = `600 ${fontSize}px 'Plus Jakarta Sans'`;
 
-  // Measure word positions for wrapping
-  const spaceWidth = c.measureText(" ").width;
+  // Measure word positions for wrapping with guaranteed clean spacing
+  const spaceWidth = Math.max(8, c.measureText(" ").width + 3);
   let lines = [];
   let currentLine = [];
   let currentLineWidth = 0;
@@ -1505,7 +1505,7 @@ function drawKaraokeSubtitle(c, chunk, x, y, maxWidth, maxHeight, isHighlighted)
 
       if (isCurrent) {
         c.fillStyle = "#FDE047"; // Active spoken word: glowing gold
-        c.font = `bold ${fontSize + 1}px 'Plus Jakarta Sans'`;
+        c.font = `bold ${fontSize}px 'Plus Jakarta Sans'`;
       } else if (isPastOrCurrent) {
         c.fillStyle = isHighlighted ? "#FEF08A" : "#FFFFFF"; // Spoken words: clean bright
         c.font = `600 ${fontSize}px 'Plus Jakarta Sans'`;
@@ -1515,7 +1515,8 @@ function drawKaraokeSubtitle(c, chunk, x, y, maxWidth, maxHeight, isHighlighted)
       }
 
       c.fillText(item.word, curX, curY);
-      curX += item.width + spaceWidth;
+      const measuredWordW = c.measureText(item.word).width;
+      curX += Math.max(item.width, measuredWordW) + spaceWidth;
     }
   }
 
