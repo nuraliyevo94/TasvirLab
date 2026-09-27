@@ -59,7 +59,7 @@ CRITICAL INSTRUCTIONS:
         }
 
         async with httpx.AsyncClient(timeout=25.0) as client:
-            for model_name in ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-flash-latest"]:
+            for model_name in ["gemini-3.1-flash-lite", "gemini-flash-lite-latest", "gemini-flash-latest"]:
                 url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
                 try:
                     resp = await client.post(url, json=payload)

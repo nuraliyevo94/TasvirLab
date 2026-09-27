@@ -177,16 +177,17 @@ class ScreenwriterEngine:
             f"o'ta sodda, qiziqarli, bosqichma-bosqich va vizual tarzda tushuntirib berasan.\n\n"
             f"QAT'IY PEDAGOGIK TALABLAR:\n"
             f"1. MAVZUNI SHUNCHAKI TAVSIF QILMA, BALKI ANIQ TUSHUNTIR VA O'RGAT! Mavzuning mohiyatini sodda, qiziqarli qilib tushuntir.\n"
-            f"2. Har bir sahnada o'qituvchi nutqiga (narration) AYNAN HAMOHANG va 100% MOS ravishda ekranda nimalar chiqishi 'visual_beats' orqali berilsin. Mavzu tabiat bo'lsa tabiat tushunchalari va emojilari (masalan daraxt, barg, quyosh), hayvonlar bo'lsa hayvon emojilari (ayiqcha, quyon), kosmos bo'lsa (sayyoralar, yulduzlar), matematika bo'lsa matematika formulasi chiqsin. Boshqa mavzularga aralashtirish qat'iyan man etiladi!\n"
-            f"3. 'visual_beats' da har bir bosqich uchun:\n"
+            f"2. NUTQ CHUQURLIGI VA BOYLIGI: Har bir sahnadagi 'narration' (o'qituvchi nutqi) kamida 25-40 ta so'zdan iborat bo'lsin! Qisqa 1 ta gap bilan cheklanma, mavzuning qiziqarli sababi, sirli tomonlari va ilmiy asosini bolalar tushunadigan quvnoq ertaknamo tarzda chuqur ochib ber.\n"
+            f"3. Har bir sahnada o'qituvchi nutqiga (narration) AYNAN HAMOHANG va 100% MOS ravishda ekranda nimalar chiqishi 'visual_beats' orqali berilsin. Mavzu tabiat bo'lsa tabiat tushunchalari va emojilari (masalan daraxt, barg, quyosh, tomchi), hayvonlar bo'lsa hayvon emojilari (ayiqcha, quyon), kosmos bo'lsa (sayyoralar, yulduzlar), matematika bo'lsa matematika formulasi chiqsin. Boshqa mavzularga aralashtirish qat'iyan man etiladi!\n"
+            f"4. 'visual_beats' da har bir bosqich uchun:\n"
             f"   - 'time_pct': 0.0 dan 1.0 gacha vaqt foizi;\n"
-            f"   - 'main_text': ekranda katta bo'lib chiqadigan asosiy so'z yoki formula (masalan: 'Kuz Fasli', 'Oltin Barglar', yoki matematika bo'lsa '2 + 2 = 4');\n"
+            f"   - 'main_text': ekranda katta bo'lib chiqadigan asosiy so'z yoki formula (masalan: 'Tomchivoy Sayri', 'Oltin Barglar', yoki matematika bo'lsa '2 + 2 = 4');\n"
             f"   - 'sub_text': ushbu sahnaning o'qituvchi nutqiga (narration) aynan mos qisqa tushunarli jumla;\n"
-            f"   - 'icons': mavzuga aynan mos 3-4 ta emoji (masalan: ['🌳', '🍁', '🍂'], ['🚀', '🪐', '⭐'], ['🐻', '🐰', '🌲']);\n"
+            f"   - 'icons': mavzuga aynan mos 3-4 ta emoji (masalan: ['💧', '☀️', '🌊'], ['🌳', '🍁', '🍂'], ['🚀', '🪐', '⭐']);\n"
             f"   - 'highlight': natija yoki muhim qoidani ta'kidlash uchun true/false.\n"
-            f"4. QAT'IYAN TAQIQLANADI: 'izohda qoldiring', 'kommentariyada yozing', 'fikringizni yozib qoldiring', 'layk bosing', 'kanalga obuna bo'ling' kabi ijtimoiy tarmoq chaqiriqlarini ishlatish MUTLAQO TAQIQLANADI! Nutq xuddi mehribon, samimiy va dono o'qituvchisidek faqat bolani qo'llab-quvvatlash, mehr va aniq bilim berishdan iborat bo'lsin.\n"
-            f"5. SONLAR VA RAQAMLAR QOIDASI (O'TA MUHIM): 'narration' (o'qituvchi aytadigan nutq matni) ichida sonlarni HECH QACHON raqam bilan yozma (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)! Har doim o'zbekcha so'z bilan to'liq yoz (masalan: 'ikkiga ikkini qo'shsak to'rt bo'ladi', 'ikkita olma', 'bir, ikki, uch, to'rt', 'ikki qo'shuv ikki teng to'rt'). Chunki audio diktor faqat so'zlarni to'g'ri va ravon o'qiydi. Ekranda ko'rinadigan 'visual_beats' ('main_text', 'sub_text') da esa bolaga tushunarli bo'lishi uchun aniq raqamlar yoki qisqa so'zlar bilan yoz.\n"
-            f"6. SAHNA SARLAVHASI (QAT'IY TALAB): Sarlavhada hech qachon '1-sahna:', '2-sahna:', 'Sahna 1', '1-qadam' kabi raqamlarni yozma! Faqat sof mavzu nomini yoz (masalan: 'Savol va Tushuncha', 'Olmalarni Sanaymiz', 'Yashil Barglar Siri', 'Daraxtlarning Oromi')."
+            f"5. QAT'IYAN TAQIQLANADI: 'izohda qoldiring', 'kommentariyada yozing', 'fikringizni yozib qoldiring', 'layk bosing', 'kanalga obuna bo'ling' kabi ijtimoiy tarmoq chaqiriqlarini ishlatish MUTLAQO TAQIQLANADI! Nutq xuddi mehribon, samimiy va dono o'qituvchisidek faqat bolani qo'llab-quvvatlash, mehr va aniq bilim berishdan iborat bo'lsin.\n"
+            f"6. SONLAR VA RAQAMLAR QOIDASI (O'TA MUHIM): 'narration' (o'qituvchi aytadigan nutq matni) ichida sonlarni HECH QACHON raqam bilan yozma (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)! Har doim o'zbekcha so'z bilan to'liq yoz (masalan: 'ikkiga ikkini qo'shsak to'rt bo'ladi', 'ikkita olma', 'bir, ikki, uch, to'rt', 'ikki qo'shuv ikki teng to'rt'). Chunki audio diktor faqat so'zlarni to'g'ri va ravon o'qiydi. Ekranda ko'rinadigan 'visual_beats' ('main_text', 'sub_text') da esa bolaga tushunarli bo'lishi uchun aniq raqamlar yoki qisqa so'zlar bilan yoz.\n"
+            f"7. SAHNA SARLAVHASI (QAT'IY TALAB): Sarlavhada hech qachon '1-sahna:', '2-sahna:', 'Sahna 1', '1-qadam' kabi raqamlarni yozma! Faqat sof mavzu nomini yoz (masalan: 'Tomchivoy va Issiq Quyosh', 'Bug'lanish Mo'jizasi', 'Olmalarni Sanaymiz', 'Yashil Barglar Siri')."
         )
 
         user_prompt = (
@@ -208,26 +209,24 @@ class ScreenwriterEngine:
             f"  \"scenes\": [\n"
             f"    {{\n"
             f"      \"scene_number\": 1,\n"
-            f"      \"title\": \"Savol va Tushuncha\",\n"
+            f"      \"title\": \"Mavzuga Kirish\",\n"
             f"      \"duration_seconds\": {round(duration_seconds / scene_count)},\n"
             f"      \"stage\": \"hook\",\n"
-            f"      \"narration\": \"(O'qituvchining samimiy, jonli, o'rgatuvchi 2-3 ta gapi)\",\n"
+            f"      \"narration\": \"(O'qituvchining samimiy, jonli, kamida 25-40 ta so'zdan iborat chuqur o'rgatuvchi nutqi)\",\n"
             f"      \"visual_prompt\": \"Clean educational explainer scene showing dynamic chalkboard illustration\",\n"
             f"      \"camera_movement\": \"Sekin yaqinlashish (Dolly In)\",\n"
             f"      \"emotion\": \"quvnoq\",\n"
             f"      \"visual_beats\": [\n"
             f"        {{\n"
             f"          \"time_pct\": 0.0,\n"
-            f"          \"badge\": \"Boshlanish\",\n"
-            f"          \"main_text\": \"Savol\",\n"
+            f"          \"main_text\": \"Asosiy Tushuncha\",\n"
             f"          \"sub_text\": \"Tushuncha bilan tanishamiz\",\n"
             f"          \"icons\": [\"💡\", \"✨\", \"🎯\"],\n"
             f"          \"highlight\": false\n"
             f"        }},\n"
             f"        {{\n"
-            f"          \"time_pct\": 0.6,\n"
-            f"          \"badge\": \"Xulosa\",\n"
-            f"          \"main_text\": \"Natija\",\n"
+            f"          \"time_pct\": 0.55,\n"
+            f"          \"main_text\": \"Muhim Sir\",\n"
             f"          \"sub_text\": \"Bilimni mustahkamlaymiz\",\n"
             f"          \"icons\": [\"⭐\", \"🎉\", \"🏆\"],\n"
             f"          \"highlight\": true\n"
@@ -246,15 +245,17 @@ class ScreenwriterEngine:
             }
         }
 
-        async with httpx.AsyncClient(timeout=20.0) as client:
-            for model_name in ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-flash-latest"]:
+        async with httpx.AsyncClient(timeout=25.0) as client:
+            for model_name in ["gemini-3.1-flash-lite", "gemini-flash-lite-latest", "gemini-flash-latest"]:
                 url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
                 try:
                     resp = await client.post(url, json=payload)
                     if resp.status_code == 200:
                         data = resp.json()
                         raw_json = data["candidates"][0]["content"]["parts"][0]["text"]
-                        parsed = json.loads(raw_json)
+                        match = re.search(r'(\{[\s\S]*\})', raw_json)
+                        json_str = match.group(1) if match else raw_json
+                        parsed = json.loads(json_str)
                         parsed["screenplay_author"] = f"Google Gemini AI ({model_name} Explainer)"
                         return parsed
                 except Exception as ex:
@@ -504,242 +505,285 @@ class ScreenwriterEngine:
         sec_per_scene = round(total_duration / scene_count)
         text_lower = f"{clean_topic} {prompt}".lower()
         
-        # A) Suv, Tomchivoy va Yomg'ir sarguzashti (Suv aylanishi)
+        # A) Suv, Tomchivoy va Yomg'ir sarguzashti (Suv aylanishi mo'jizasi)
         if ScreenwriterEngine.has_keyword(text_lower, ["suv", "tomchi", "tomchivoy", "yomg'ir", "bulut", "daryo", "dengiz", "oqim"]):
+            all_scenes = [
+                {
+                    "scene_number": 1,
+                    "title": "Jajji Tomchivoy va Iliq Quyosh",
+                    "duration_seconds": sec_per_scene,
+                    "stage": "hook",
+                    "narration": "Salom, mening jajji va zukko do'stim! Katta moviy daryo to'lqinlarida quvnoq Tomchivoy o'z do'stlari bilan yashar ekan. Bir kuni osmonda saxiy Quyosh charqlab, suvni mehr bilan isita boshlabdi. Tomchivoy o'zining yengillashib, ko'rinmas bug'ga aylanayotganini his qilibdi!",
+                    "visual_prompt": "Smiling cute water droplet character warming under golden sunrays in a crystal blue river",
+                    "camera_movement": "Sekin yaqinlashish (Dolly In)",
+                    "emotion": "quvnoq"
+                },
+                {
+                    "scene_number": 2,
+                    "title": "Osmonga Parvoz va Bug'lanish Siri",
+                    "duration_seconds": sec_per_scene,
+                    "stage": "cause",
+                    "narration": "Nega suv yuqoriga ko'tariladi, bilasanmi? Chunki issiq bug' havodan ancha yengil bo'ladi va sharlar kabi osmonga parvoz qiladi! Tomchivoy daryo, yam-yashil o'rmonlar va baland tog'lar ustidan qushdek erkin uchib o'tibdi.",
+                    "visual_prompt": "Warm vapor beads floating upwards into clear blue sky over majestic mountains",
+                    "camera_movement": "Yon tomondan kuzatish (Pan Right)",
+                    "emotion": "hayrat"
+                },
+                {
+                    "scene_number": 3,
+                    "title": "Sovuq Havo va Momiq Bulutlar",
+                    "duration_seconds": sec_per_scene,
+                    "stage": "process",
+                    "narration": "Baland osmonda esa havo juda soviydi. Qara, sovuqda millionlab jajji bug' tomchilari bir-birini mahkam quchoqlab, oppoq va momiq bulutga aylanibdi! Shamol bu mehribon bulutni chanqagan dalalar va chiroyli bog'lar uzra sayohatga yetaklabdi.",
+                    "visual_prompt": "Fluffy happy white cloud traveling smoothly across mountain valleys guided by gentle breeze",
+                    "camera_movement": "Markazga fokus",
+                    "emotion": "qiziqish"
+                },
+                {
+                    "scene_number": 4,
+                    "title": "Shirin Yomg'ir va Kamalak",
+                    "duration_seconds": sec_per_scene,
+                    "stage": "climax",
+                    "narration": "Bulutdagi tomchilar ko'payib, og'irlashibdi va yerga shirin, shifobaxsh yomg'ir bo'lib yog'ibdi! Chanqagan gullar, baland daraxtlar to'yib suv ichib quvonishibdi. Osmonda esa yetti rangli go'zal kamalak jilvalanibdi!",
+                    "visual_prompt": "Gentle refreshing rain drops nourishing blooming colorful flowers under a vibrant 7-color rainbow",
+                    "camera_movement": "Sekin yaqinlashish (Dolly In)",
+                    "emotion": "quvonch"
+                },
+                {
+                    "scene_number": 5,
+                    "title": "Ona Daryoga Qaytish va Yangi Hayot",
+                    "duration_seconds": sec_per_scene,
+                    "stage": "solution",
+                    "narration": "Ofarin, do'stim! Yomg'ir suvlari yerga singib, soylarga, soylardan esa yana ona daryoga qaytib quyilibdi. Mana bu hodisa tabiatda suvning aylanma harakati deyiladi. Suv hech qachon yo'qolmaydi, u doimo tabiatga hayot ulashadi!",
+                    "visual_prompt": "Clear stream flowing back into a sparkling river completing the miraculous water cycle",
+                    "camera_movement": "Sekin uzoqlashish (Zoom Out)",
+                    "emotion": "orom"
+                }
+            ]
+            chosen = all_scenes[:scene_count] if scene_count <= len(all_scenes) else all_scenes
+            for idx, sc in enumerate(chosen):
+                sc["scene_number"] = idx + 1
             return {
                 "title": f"Tabiat Darsi: {clean_topic}",
-                "moral_summary": "Suv quyosh nuri ostida bug'lanib bulutga aylanadi va yomg'ir bo'lib yerga hayot ulashadi.",
-                "scenes": [
-                    {
-                        "scene_number": 1,
-                        "title": "Jajji Tomchivoy bilan tanishuv",
-                        "duration_seconds": sec_per_scene,
-                        "stage": "hook",
-                        "narration": "Salom, mening jajji do'stim! Katta moviy daryoda quvnoq Tomchivoy yashar ekan. Bir kuni iliq quyosh nuri tushib, u yengil bug'ga aylanib osmonga ucha boshlabdi!",
-                        "visual_prompt": "Cheerful smiling water droplet rising from a blue river towards the warm sun",
-                        "camera_movement": "Sekin yaqinlashish (Dolly In)",
-                        "emotion": "quvnoq"
-                    },
-                    {
-                        "scene_number": 2,
-                        "title": "Momiq bulutlar va sayohat",
-                        "duration_seconds": sec_per_scene,
-                        "stage": "cause",
-                        "narration": "Osmonda u millionlab do'stlari bilan uchrashib, oppoq va momiq bulutga aylanibdi! Shamol bu mehribon bulutni baland tog'lar va yashil vodiylar uzra uzoqlarga uchirib ketibdi.",
-                        "visual_prompt": "Cute water droplets gathering into a friendly fluffy white cloud floating over mountains",
-                        "camera_movement": "Yon tomondan kuzatish (Pan Right)",
-                        "emotion": "hayrat"
-                    },
-                    {
-                        "scene_number": 3,
-                        "title": "Mayin yomg'ir va tabiat quvonchi",
-                        "duration_seconds": sec_per_scene,
-                        "stage": "solution",
-                        "narration": "Bulut to'lishib, yerga shirin yomg'ir bo'lib yog'ibdi! Chanqagan gullar, baland daraxtlar suv ichib quvonishibdi. Tomchivoy yana ona yerga qaytib, tabiatga yangi hayot bag'ishlabdi!",
-                        "visual_prompt": "Gentle rain drops nourishing colorful blooming flowers and a rainbow arc in the sky",
-                        "camera_movement": "Sekin uzoqlashish (Zoom Out)",
-                        "emotion": "quvonch"
-                    }
-                ],
+                "moral_summary": "Suv quyosh nuri ostida bug'lanib bulutga aylanadi va yomg'ir bo'lib ona yerga qaytadi. Bu tabiatning cheksiz hayot aylanishidir.",
+                "scenes": chosen,
                 "screenplay_author": "KidsVidEdu Virtual O'qituvchi v4.0"
             }
 
-        # B) Matematika mavzusi (Masalan: 2 ga 2 ni qo'shish)
+        # B) Matematika mavzusi (Hisoblash va mantiq)
         if any(w in text_lower for w in ["qo'sh", "+", "matematika", "karra", "2 ga 2", "hisoblash", "son"]):
+            all_scenes = [
+                {
+                    "scene_number": 1,
+                    "title": "Olmalarni Sanaymiz",
+                    "duration_seconds": sec_per_scene,
+                    "stage": "hook",
+                    "narration": "Salom, mening aqlli do'stim! Bugun biz birga qiziqarli hisoblash sirini o'rganamiz. Tasavvur qil, bog'dan ikkita shirin qizil olma terib olding. Keyin do'sting senga yana ikkita olma sovg'a qildi. Jami nechta olma bo'ladi?",
+                    "visual_prompt": "Clean bright educational chalkboard with 2 shiny red apples on left and 2 red apples on right",
+                    "camera_movement": "Sekin yaqinlashish (Dolly In)",
+                    "emotion": "quvnoq"
+                },
+                {
+                    "scene_number": 2,
+                    "title": "Qo'shish Amali Qoidasi",
+                    "duration_seconds": sec_per_scene,
+                    "stage": "cause",
+                    "narration": "Buni aniqlash uchun biz ikkiga ikkini qo'shamiz! Qara, doskaga ikki qo'shuv ikki deb yozamiz. Qo'shish amali narsalarni bir savatga jamlash demakdir. Keling, barcha olmalarni birma-bir sanaymiz: bir, ikki, uch, to'rt!",
+                    "visual_prompt": "Animated equation 2 + 2 = ? with counting numbers glowing over apples",
+                    "camera_movement": "Markazga fokus",
+                    "emotion": "qiziqish"
+                },
+                {
+                    "scene_number": 3,
+                    "title": "Natija: Ikkiga Ikkini Qo'shsak To'rt!",
+                    "duration_seconds": sec_per_scene,
+                    "stage": "solution",
+                    "narration": "Ofarin, juda to'g'ri topding! Ikkiga ikkini qo'shsak, to'rt bo'ladi! Qara: ikki qo'shuv ikki teng to'rt! Bizda to'rtta shirin va vitaminlarga boy olma bor. Matematika bilan hisoblash juda oson va zavqli, shunday emasmi?",
+                    "visual_prompt": "Glowing celebratory 2 + 2 = 4 on blackboard surrounded by 4 shiny apples and golden stars",
+                    "camera_movement": "Aylanma harakat",
+                    "emotion": "quvonch"
+                }
+            ]
+            chosen = all_scenes[:scene_count] if scene_count <= len(all_scenes) else all_scenes
+            for idx, sc in enumerate(chosen):
+                sc["scene_number"] = idx + 1
             return {
-                "title": f"Matematika O'qituvchisi: {clean_topic}",
-                "moral_summary": "Qo'shish orqali narsalarni birga jamlash va to'g'ri hisoblashni o'rganamiz.",
-                "scenes": [
-                    {
-                        "scene_number": 1,
-                        "title": "Olmalarni ko'ramiz",
-                        "duration_seconds": sec_per_scene,
-                        "stage": "hook",
-                        "narration": "Salom bolajonim! Bugun biz birga hisoblashni o'rganamiz. Tasavvur qil, senga ikkita qizil olma berishdi. Keyin yana ikkita olma berishdi. Jami nechta bo'ladi?",
-                        "visual_prompt": "Clean bright 3D animated chalkboard with 2 red apples on one side and 2 red apples on the other side",
-                        "camera_movement": "Sekin yaqinlashish (Dolly In)",
-                        "emotion": "quvnoq"
-                    },
-                    {
-                        "scene_number": 2,
-                        "title": "Qo'shish amali (2 + 2)",
-                        "duration_seconds": sec_per_scene,
-                        "stage": "cause",
-                        "narration": "Buni bilish uchun biz ikkiga ikkini qo'shamiz! Qara, doskaga ikki qo'shuv ikki deb yozamiz. Keling, barcha olmalarni birga sanaymiz: bir, ikki, uch, to'rt!",
-                        "visual_prompt": "3D animated chalkboard showing equation 2 + 2 = ? with counting numbers",
-                        "camera_movement": "Markazga fokus",
-                        "emotion": "qiziqish"
-                    },
-                    {
-                        "scene_number": 3,
-                        "title": "Natija: 2 + 2 = 4!",
-                        "duration_seconds": sec_per_scene,
-                        "stage": "solution",
-                        "narration": "Ofarin! Ikkiga ikkini qo'shsak, to'rt bo'ladi! Qara: ikki qo'shuv ikki teng to'rt! Jami to'rtta shirin olma bo'ldi. Matematika juda qiziq, shunday emasmi?",
-                        "visual_prompt": "3D animated chalkboard glowing 2 + 2 = 4 with 4 shiny apples and stars",
-                        "camera_movement": "Aylanma harakat",
-                        "emotion": "quvonch"
-                    }
-                ],
+                "title": f"Matematika Darsi: {clean_topic}",
+                "moral_summary": "Qo'shish amali narsalarni birga jamlash va to'g'ri hisoblashni o'rgatadi.",
+                "scenes": chosen,
                 "screenplay_author": "KidsVidEdu Virtual O'qituvchi v4.0"
             }
 
         # C) Daraxtlar va fasllar mavzusi
         if any(w in text_lower for w in ["daraxt", "barg", "kuz", "chinor", "oltin"]):
+            all_scenes = [
+                {
+                    "scene_number": 1,
+                    "title": "Kuzda Nega Ranglar O'zgaradi?",
+                    "duration_seconds": sec_per_scene,
+                    "stage": "hook",
+                    "narration": "Assalomu alaykum, aziz do'stim! Kuz kelganda daraxtlarning yashil barglari nega birdan oltin va qizil rangga kirishini bilasanmi? Keling, tabiatning bu ajoyib sirini birga ochamiz!",
+                    "visual_prompt": "Sunny green summer tree transitioning into golden autumn tree",
+                    "camera_movement": "Sekin yaqinlashish (Dolly In)",
+                    "emotion": "hayrat"
+                },
+                {
+                    "scene_number": 2,
+                    "title": "Quyosh va Yashil Bo'yoq Siri",
+                    "duration_seconds": sec_per_scene,
+                    "stage": "cause",
+                    "narration": "Yozda barglarda quyosh nuri tufayli yashil xlorofill juda ko'p bo'ladi. Kuzda esa kunlar qisqarib, havo soviydi. Yashil rang kamayib, barglarning asl oltin va qizil rangi ko'rina boshlaydi.",
+                    "visual_prompt": "Macro animated leaf with smiling sun and changing colors from green to yellow",
+                    "camera_movement": "Yon tomondan kuzatish (Pan Right)",
+                    "emotion": "qiziqish"
+                },
+                {
+                    "scene_number": 3,
+                    "title": "Daraxtning Qishki Shirin Oromi",
+                    "duration_seconds": sec_per_scene,
+                    "stage": "solution",
+                    "narration": "Qishda yer muzlab qolganda daraxt ildizlari orqali suv icha olmaydi. Shuning uchun daraxt barcha barglarini to'kib, qishki shirin uyquga ketadi. Bahorda esa yangi yam-yashil yaproqlar unib chiqadi!",
+                    "visual_prompt": "Peacefully sleeping tree covered in soft winter twilight ready for spring buds",
+                    "camera_movement": "Sekin uzoqlashish (Zoom Out)",
+                    "emotion": "orom"
+                }
+            ]
+            chosen = all_scenes[:scene_count] if scene_count <= len(all_scenes) else all_scenes
+            for idx, sc in enumerate(chosen):
+                sc["scene_number"] = idx + 1
             return {
                 "title": f"Tabiat Darsi: {clean_topic}",
                 "moral_summary": "Daraxtlar qishki sovuqda suvni tejash va orom olish uchun barglarini to'kadi.",
-                "scenes": [
-                    {
-                        "scene_number": 1,
-                        "title": "Kuzda nega ranglar o'zgaradi?",
-                        "duration_seconds": sec_per_scene,
-                        "stage": "hook",
-                        "narration": "Assalomu alaykum, aziz do'stim! Kuz kelganda daraxtlarning yashil barglari nega birdan oltin va qizil rangga kirishini bilasanmi? Keling, bu ajoyib sirni birga ochamiz!",
-                        "visual_prompt": "Sunny green summer tree transitioning into golden autumn tree",
-                        "camera_movement": "Sekin yaqinlashish (Dolly In)",
-                        "emotion": "hayrat"
-                    },
-                    {
-                        "scene_number": 2,
-                        "title": "Quyosh va yashil bo'yoq siri",
-                        "duration_seconds": sec_per_scene,
-                        "stage": "cause",
-                        "narration": "Yozda barglarda quyosh nuri tufayli yashil xlorofill ko'p bo'ladi. Kuzda esa kunlar qisqarib, havo soviydi. Yashil rang kamayib, barglarning asl oltin va sariq rangi ko'rina boshlaydi.",
-                        "visual_prompt": "Macro animated leaf with smiling sun and changing colors from green to yellow",
-                        "camera_movement": "Yon tomondan kuzatish (Pan Right)",
-                        "emotion": "qiziqish"
-                    },
-                    {
-                        "scene_number": 3,
-                        "title": "Daraxtning qishki oromi",
-                        "duration_seconds": sec_per_scene,
-                        "stage": "solution",
-                        "narration": "Qishda yer muzlab qolganda daraxt ildizlari orqali suv icha olmaydi. Shuning uchun daraxt barcha barglarini to'kib, qishki shirin uyquga ketadi. Bahorda esa yangi yaproqlar unib chiqadi!",
-                        "visual_prompt": "Peacefully sleeping tree covered in soft winter twilight ready for spring buds",
-                        "camera_movement": "Sekin uzoqlashish (Zoom Out)",
-                        "emotion": "orom"
-                    }
-                ],
+                "scenes": chosen,
                 "screenplay_author": "KidsVidEdu Virtual O'qituvchi v4.0"
             }
 
         # D) Koinot va Sayyoralar mavzusi
         if ScreenwriterEngine.has_keyword(text_lower, ["kosmos", "sayyora", "quyosh sistemasi", "yulduz", "raketa", "mars", "saturn"]):
+            all_scenes = [
+                {
+                    "scene_number": 1,
+                    "title": "Cheksiz va Sirli Koinot",
+                    "duration_seconds": sec_per_scene,
+                    "stage": "hook",
+                    "narration": "Salom, yosh astronom do'stim! Tunda osmonga qarab porloq yulduzlarni ko'rganmisan? Cheksiz koinotda qanchadan-qancha ajoyib sayyoralar borligini bilasanmi? Keling, birga sayohat qilamiz!",
+                    "visual_prompt": "Kids looking at starry night sky with twinkling stars and crescent moon",
+                    "camera_movement": "Sekin yaqinlashish (Dolly In)",
+                    "emotion": "hayrat"
+                },
+                {
+                    "scene_number": 2,
+                    "title": "Quyosh va Sakkiz Sayyora",
+                    "duration_seconds": sec_per_scene,
+                    "stage": "cause",
+                    "narration": "Ulkan va yorqin Quyosh atrofida sakkizta sayyora aylanadi. Biz yashaydigan moviy Yer sayyorasi esa hayot mavjud bo'lgan eng go'zal va yagona makonimizdir!",
+                    "visual_prompt": "Solar system with bright sun in the center and colorful planets orbiting smoothly",
+                    "camera_movement": "Aylanma harakat",
+                    "emotion": "qiziqish"
+                },
+                {
+                    "scene_number": 3,
+                    "title": "Orzular va Yulduzlar Sari",
+                    "duration_seconds": sec_per_scene,
+                    "stage": "solution",
+                    "narration": "Yaxshi o'qisang, kelajakda ulkan raketada kosmosga uchib, yangi yulduzlar va sirlarni kashf qilishing mumkin! Ilm o'rganish koinot sirlarini ochishga yordam beradi.",
+                    "visual_prompt": "Friendly white cartoon rocket flying past a purple ringed planet with twinkling stars",
+                    "camera_movement": "Sekin uzoqlashish (Zoom Out)",
+                    "emotion": "quvonch"
+                }
+            ]
+            chosen = all_scenes[:scene_count] if scene_count <= len(all_scenes) else all_scenes
+            for idx, sc in enumerate(chosen):
+                sc["scene_number"] = idx + 1
             return {
                 "title": f"Koinot Sirlari: {clean_topic}",
                 "moral_summary": "Bizning Yer sayyoramiz va quyosh sistemasi cheksiz koinotning ajoyib mo'jizasidir.",
-                "scenes": [
-                    {
-                        "scene_number": 1,
-                        "title": "Cheksiz va sirli koinot",
-                        "duration_seconds": sec_per_scene,
-                        "stage": "hook",
-                        "narration": "Salom, yosh astronom do'stim! Tunda osmonga qarab porloq yulduzlarni ko'rganmisan? Koinotda qanchadan-qancha ajoyib sayyoralar borligini bilasanmi?",
-                        "visual_prompt": "Kids looking at starry night sky with twinkling stars and crescent moon",
-                        "camera_movement": "Sekin yaqinlashish (Dolly In)",
-                        "emotion": "hayrat"
-                    },
-                    {
-                        "scene_number": 2,
-                        "title": "Quyosh va uning do'stlari",
-                        "duration_seconds": sec_per_scene,
-                        "stage": "cause",
-                        "narration": "Quyosh atrofida sakkizta ulkan sayyora aylanadi. Biz yashaydigan moviy Yer sayyorasi esa hayot mavjud bo'lgan eng go'zal va yagona makonimizdir!",
-                        "visual_prompt": "Solar system with bright sun in the center and colorful planets orbiting smoothly",
-                        "camera_movement": "Aylanma harakat",
-                        "emotion": "qiziqish"
-                    },
-                    {
-                        "scene_number": 3,
-                        "title": "Orzular va yulduzlar sari",
-                        "duration_seconds": sec_per_scene,
-                        "stage": "solution",
-                        "narration": "Yaxshi o'qisang, kelajakda ulkan raketada kosmosga uchib, yangi yulduzlarni kashf qilishing mumkin! Ilm o'rganish koinot sirlarini ochishga yordam beradi.",
-                        "visual_prompt": "Friendly white cartoon rocket flying past a purple ringed planet with twinkling stars",
-                        "camera_movement": "Sekin uzoqlashish (Zoom Out)",
-                        "emotion": "quvonch"
-                    }
-                ],
+                "scenes": chosen,
                 "screenplay_author": "KidsVidEdu Virtual O'qituvchi v4.0"
             }
 
         # E) Jonivorlar va Hayvonlar olami
         if ScreenwriterEngine.has_keyword(text_lower, ["hayvon", "ayiq", "quyon", "tulki", "bo'ri", "sher", "fil", "jonivor", "o'rmon"]):
+            all_scenes = [
+                {
+                    "scene_number": 1,
+                    "title": "Do'stona Jonivorlar Bilan Uchrashuv",
+                    "duration_seconds": sec_per_scene,
+                    "stage": "hook",
+                    "narration": "Salom, aziz bolajonim! O'rmon va tabiatda qanday qiziqarli jonivorlar yashashini bilasanmi? Har bir hayvonning o'ziga xos ajoyib xislatlari va sirlari bor!",
+                    "visual_prompt": "Lush green forest glade with cheerful animals gathered near a crystal stream",
+                    "camera_movement": "Sekin yaqinlashish (Dolly In)",
+                    "emotion": "quvnoq"
+                },
+                {
+                    "scene_number": 2,
+                    "title": "Har Bir Jonivorning O'z Vazifasi",
+                    "duration_seconds": sec_per_scene,
+                    "stage": "cause",
+                    "narration": "Ayiqlar qishda shirin uyquga ketadi, chaqqon quyonlar esa xavfdan tezda qochadi. Qushlar daraxtlarni zararkunandalardan tozalab, tabiat muvozanatini saqlashda juda muhim o'rin tutadi.",
+                    "visual_prompt": "Animated forest animals demonstrating their natural habits in a colorful woodland",
+                    "camera_movement": "Yon tomondan kuzatish (Pan Right)",
+                    "emotion": "qiziqish"
+                },
+                {
+                    "scene_number": 3,
+                    "title": "Tabiatni va Hayvonlarni Asraymiz",
+                    "duration_seconds": sec_per_scene,
+                    "stage": "solution",
+                    "narration": "Biz jonivorlarga doimo mehribon bo'lishimiz, tabiatni toza saqlashimiz kerak. Shunda barcha hayvonlar bizning vafodor va quvnoq do'stimiz bo'lib qoladi!",
+                    "visual_prompt": "Smiling child feeding birds in a sunny meadow surrounded by friendly animals",
+                    "camera_movement": "Sekin uzoqlashish (Zoom Out)",
+                    "emotion": "quvonch"
+                }
+            ]
+            chosen = all_scenes[:scene_count] if scene_count <= len(all_scenes) else all_scenes
+            for idx, sc in enumerate(chosen):
+                sc["scene_number"] = idx + 1
             return {
                 "title": f"Jonivorlar Olami: {clean_topic}",
                 "moral_summary": "Hayvonlar tabiatning ajralmas qismi bo'lib, ularni asrash va mehr ko'rsatish bizning burchimizdir.",
-                "scenes": [
-                    {
-                        "scene_number": 1,
-                        "title": "Do'stona jonivorlar bilan uchrashuv",
-                        "duration_seconds": sec_per_scene,
-                        "stage": "hook",
-                        "narration": "Salom, aziz bolajonim! O'rmon va tabiatda qanday qiziqarli jonivorlar yashashini bilasanmi? Har bir hayvonning o'ziga xos ajoyib xislatlari bor!",
-                        "visual_prompt": "Lush green forest glade with cheerful animals gathered near a crystal stream",
-                        "camera_movement": "Sekin yaqinlashish (Dolly In)",
-                        "emotion": "quvnoq"
-                    },
-                    {
-                        "scene_number": 2,
-                        "title": "Har bir jonivorning o'z siri",
-                        "duration_seconds": sec_per_scene,
-                        "stage": "cause",
-                        "narration": "Ayiqlar qishda shirin uyquga ketadi, chaqqon quyonlar esa xavfdan tezda qochadi. Ular tabiatning muvozanatini saqlashda juda muhim o'rin tutadi.",
-                        "visual_prompt": "Animated forest animals demonstrating their natural habits in a colorful woodland",
-                        "camera_movement": "Yon tomondan kuzatish (Pan Right)",
-                        "emotion": "qiziqish"
-                    },
-                    {
-                        "scene_number": 3,
-                        "title": "Tabiatni va hayvonlarni asraymiz",
-                        "duration_seconds": sec_per_scene,
-                        "stage": "solution",
-                        "narration": "Biz jonivorlarga doimo mehribon bo'lishimiz, tabiatni toza saqlashimiz kerak. Shunda barcha hayvonlar bizning vafodor do'stimiz bo'lib qoladi!",
-                        "visual_prompt": "Smiling child feeding birds in a sunny meadow surrounded by friendly animals",
-                        "camera_movement": "Sekin uzoqlashish (Zoom Out)",
-                        "emotion": "quvonch"
-                    }
-                ],
+                "scenes": chosen,
                 "screenplay_author": "KidsVidEdu Virtual O'qituvchi v4.0"
             }
 
         # F) Boshqa har qanday umumiy dars (Boyitilgan, jonli pedagogik matn)
-        scenes = [
+        all_scenes = [
             {
                 "scene_number": 1,
-                "title": f"{clean_topic} bilan tanishuv",
+                "title": f"{clean_topic} Bilan Tanishuv",
                 "duration_seconds": sec_per_scene,
                 "stage": "hook",
-                "narration": f"Salom, mening aqlli do'stim! Bugun biz sen bilan juda ajoyib va qiziqarli mavzu — {clean_topic} haqida bilib olamiz. Bu qanday yuz berishini hech o'ylab ko'rganmisan?",
+                "narration": f"Salom, mening aqlli do'stim! Bugun biz sen bilan juda ajoyib va qiziqarli mavzu — {clean_topic} haqida bilib olamiz. Bu hodisa qanday yuz berishini hech o'ylab ko'rganmisan? Keling, birga qiziqarli sirlarni ochamiz!",
                 "visual_prompt": f"Bright engaging educational chalkboard introducing {clean_topic} with vivid colorful elements",
                 "camera_movement": "Sekin yaqinlashish (Dolly In)",
                 "emotion": "hayrat"
             },
             {
                 "scene_number": 2,
-                "title": "Qiziqarli hodisa siri",
+                "title": "Qiziqarli Hodisa Siri",
                 "duration_seconds": sec_per_scene,
                 "stage": "cause",
-                "narration": f"Diqqat bilan qara, tabiatda va hayotda har bir narsaning o'z tartibi va ajoyib sababi bor! {clean_topic} ham bosqichma-bosqich sodir bo'ladi va atrofdagi olamga o'zgacha go'zallik bag'ishlaydi.",
+                "narration": f"Diqqat bilan qara, tabiatda va hayotda har bir narsaning o'z tartibi va ajoyib sababi bor! {clean_topic} ham bosqichma-bosqich sodir bo'ladi va atrofdagi borliqqa o'zgacha go'zallik va tartib bag'ishlaydi.",
                 "visual_prompt": f"Detailed educational explanation illustration revealing the inner mechanism of {clean_topic}",
                 "camera_movement": "Yon tomondan kuzatish (Pan Right)",
                 "emotion": "qiziqish"
             },
             {
                 "scene_number": 3,
-                "title": "Katta saboq va xulosa",
+                "title": "Katta Saboq va Xulosa",
                 "duration_seconds": sec_per_scene,
                 "stage": "solution",
-                "narration": f"Ofarin, do'stim! Bugun biz yangi va foydali bilimni o'rganib oldik. Har bir o'rgangan biliming seni yanada dono va zehnli qiladi. Yangi bilimlarni kashf etishdan aslo to'xtama!",
+                "narration": f"Ofarin, do'stim! Bugun biz yangi va nihoyatda foydali bilimni o'rganib oldik. Har bir o'rgangan biliming seni yanada dono va zehnli qiladi. Dunyoni kashf etishdan aslo to'xtama!",
                 "visual_prompt": f"Celebratory colorful achievement screen with gold stars and cheerful elements for {clean_topic}",
                 "camera_movement": "Sekin uzoqlashish (Zoom Out)",
                 "emotion": "quvonch"
             }
         ]
+        chosen = all_scenes[:scene_count] if scene_count <= len(all_scenes) else all_scenes
+        for idx, sc in enumerate(chosen):
+            sc["scene_number"] = idx + 1
         return {
             "title": f"Tushunarli Darslik: {clean_topic}",
             "moral_summary": f"{clean_topic} mavzusini qunt bilan o'rganish bolajonga dunyoni yanada yaxshiroq anglashga yordam beradi.",
-            "scenes": scenes[:scene_count] if scene_count <= len(scenes) else scenes,
+            "scenes": chosen,
             "screenplay_author": "KidsVidEdu Virtual O'qituvchi v4.0"
         }
