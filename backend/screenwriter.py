@@ -246,21 +246,56 @@ class ScreenwriterEngine:
             }
         }
 
-        async with httpx.AsyncClient(timeout=18.0) as client:
-            model_name = "gemini-flash-lite-latest"
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
-            try:
-                resp = await client.post(url, json=payload)
-                if resp.status_code == 200:
-                    data = resp.json()
-                    raw_json = data["candidates"][0]["content"]["parts"][0]["text"]
-                    parsed = json.loads(raw_json)
-                    parsed["screenplay_author"] = f"Google Gemini AI ({model_name} Explainer)"
-                    return parsed
-            except Exception as ex:
-                print(f"Gemini model {model_name} xatolik: {ex}")
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            for model_name in ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-flash-latest"]:
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
+                try:
+                    resp = await client.post(url, json=payload)
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        raw_json = data["candidates"][0]["content"]["parts"][0]["text"]
+                        parsed = json.loads(raw_json)
+                        parsed["screenplay_author"] = f"Google Gemini AI ({model_name} Explainer)"
+                        return parsed
+                except Exception as ex:
+                    print(f"Gemini model {model_name} xatolik: {ex}")
 
         return None
+
+    @staticmethod
+    def has_keyword(text: str, keywords: list) -> bool:
+        """Tekst ichidan kalit so'zlarni butun so'z sifatida to'g'ri qidirish ('oy' 'ajoyib' ichida topilmaydi)."""
+        t = f" {text.lower()} "
+        for kw in keywords:
+            k = kw.lower()
+            if len(k) <= 4:
+                if re.search(r'(?<![a-zA-Z\u0400-\u04FF\'])' + re.escape(k) + r'(?![a-zA-Z\u0400-\u04FF\'])', t):
+                    return True
+            else:
+                if k in t:
+                    return True
+        return False
+
+    @staticmethod
+    def _split_narration_into_beats(narration: str) -> tuple:
+        """Gapni so'zlarni aslo kesmasdan butun jumlalarga ajratish."""
+        if not narration:
+            return ("", "")
+        
+        # Nuqta, undov yoki so'roq belgilari bo'yicha mustaqil gaplarga ajratish
+        sentences = re.findall(r'[^.!?]+[.!?]*', narration)
+        sentences = [s.strip() for s in sentences if s.strip()]
+        
+        if len(sentences) >= 2:
+            return (sentences[0], " ".join(sentences[1:]))
+        
+        # Agar bitta uzun gap bo'lsa, butun so'zlar bo'yicha ikkiga bo'lish
+        words = narration.split()
+        if len(words) <= 7:
+            return (narration, narration)
+        
+        mid = len(words) // 2
+        return (" ".join(words[:mid]), " ".join(words[mid:]))
 
     @staticmethod
     def _enrich_scene_visual_beats(scene: Dict[str, Any], topic: str):
@@ -276,9 +311,40 @@ class ScreenwriterEngine:
             clean_title = topic
         
         full_text = f"{topic} {clean_title} {narration}".lower()
-        
-        # 1. Haqiqiy Matematika (qo'shish/ayirish/hisoblash) - qo'shiq yoki qo'shni so'zlari bilan chalkashtirmaymiz
-        is_math = ("+" in full_text or "qo'shish amali" in full_text or "matematika" in full_text or "hisoblaymiz" in full_text) and not any(w in full_text for w in ["qo'shiq", "qo'shni", "qo'shil"])
+        part1, part2 = ScreenwriterEngine._split_narration_into_beats(narration)
+
+        # 1. Suv, tomchi, yomg'ir, daryo, bulut (ENG BIRINCHI O'RINDA!)
+        if ScreenwriterEngine.has_keyword(full_text, ["suv", "tomchi", "tomchivoy", "yomg'ir", "bulut", "daryo", "dengiz", "okean", "muz", "bug'", "oqim", "suv tomchisi"]):
+            scene_num = scene.get("scene_number", 1)
+            icons1 = ["💧", "☀️", "🌊", "✨"]
+            icons2 = ["☁️", "🌧️", "🌈", "🌱"]
+            if scene_num == 2:
+                icons1 = ["☀️", "✨", "☁️", "💧"]
+                icons2 = ["☁️", "💨", "🏔️", "✨"]
+            elif scene_num >= 3:
+                icons1 = ["☁️", "🌧️", "💧", "☔"]
+                icons2 = ["🌈", "🌸", "🌱", "💧"]
+
+            scene["visual_beats"] = [
+                {
+                    "time_pct": 0.0,
+                    "main_text": clean_title,
+                    "sub_text": part1,
+                    "icons": icons1,
+                    "highlight": False
+                },
+                {
+                    "time_pct": 0.55,
+                    "main_text": "Tabiat Mo'jizasi",
+                    "sub_text": part2,
+                    "icons": icons2,
+                    "highlight": True
+                }
+            ]
+            return
+
+        # 2. Haqiqiy Matematika (qo'shish/ayirish/hisoblash)
+        is_math = ("+" in full_text or ScreenwriterEngine.has_keyword(full_text, ["qo'shish", "ayirish", "karra", "matematika", "hisoblaymiz"])) and not any(w in full_text for w in ["qo'shiq", "qo'shni"])
         math_digits = re.findall(r'\b(\d+)\b', f"{clean_title} {narration}")
         
         if is_math and len(math_digits) >= 2:
@@ -295,7 +361,7 @@ class ScreenwriterEngine:
                 {
                     "time_pct": 0.0,
                     "main_text": f"{n1} + {n2}",
-                    "sub_text": narration[:80] if len(narration) > 80 else narration,
+                    "sub_text": part1,
                     "icons": [icon] * min(4, n1) + ["+"] + [icon] * min(4, n2),
                     "highlight": False
                 },
@@ -309,126 +375,123 @@ class ScreenwriterEngine:
             ]
             return
 
-        # 2. Hayvonlar va Jonivorlar olami
-        if any(w in full_text for w in ["hayvon", "ayiq", "quyon", "tulki", "bo'ri", "sher", "mushuk", "kuchuk", "it", "fil", "baliq", "delfin", "qush"]):
-            icons = ["🐻", "🐰", "🦊", "🦁"]
-            if "baliq" in full_text or "delfin" in full_text or "dengiz" in full_text:
-                icons = ["🐬", "🌊", "🐠", "🫧"]
-            elif "qush" in full_text:
-                icons = ["🐦", "🌿", "🐣", "✨"]
-            elif "mushuk" in full_text or "kuchuk" in full_text:
-                icons = ["🐱", "🐶", "🐾", "❤️"]
-
-            scene["visual_beats"] = [
-                {
-                    "time_pct": 0.0,
-                    "main_text": clean_title,
-                    "sub_text": narration[:75] if len(narration) > 75 else narration,
-                    "icons": icons,
-                    "highlight": False
-                },
-                {
-                    "time_pct": 0.55,
-                    "main_text": "Do'stona Tabiat",
-                    "sub_text": narration[75:160] if len(narration) > 75 else narration,
-                    "icons": icons,
-                    "highlight": True
-                }
-            ]
-            return
-
-        # 3. Fazoviy olam / Kosmos va Quyosh
-        if any(w in full_text for w in ["kosmos", "sayyora", "quyosh", "oy", "yulduz", "raketa", "mars", "yer"]):
-            icons = ["🚀", "🌍", "🌕", "⭐"]
-            scene["visual_beats"] = [
-                {
-                    "time_pct": 0.0,
-                    "main_text": clean_title,
-                    "sub_text": narration[:75] if len(narration) > 75 else narration,
-                    "icons": icons,
-                    "highlight": False
-                },
-                {
-                    "time_pct": 0.55,
-                    "main_text": "Mo'jizaviy Koinot",
-                    "sub_text": narration[75:160] if len(narration) > 75 else narration,
-                    "icons": ["🪐", "✨", "☀️", "🌟"],
-                    "highlight": True
-                }
-            ]
-            return
-
-        # 4. Tabiat, Fasllar va Daraxtlar (Kuz, Bahor, Yomg'ir, Suv)
-        if any(w in full_text for w in ["daraxt", "barg", "kuz", "bahor", "yoz", "qish", "suv", "tomchi", "yomg'ir", "qor", "bulut"]):
+        # 3. Tabiat, Fasllar va Daraxtlar (Kuz, Bahor, Qish, Daraxt, Barg)
+        if ScreenwriterEngine.has_keyword(full_text, ["daraxt", "barg", "kuz", "bahor", "yoz", "qish", "fasl", "chinor", "oltin", "o'rmon"]):
             icons = ["🌳", "🍃", "🍁", "☀️"]
-            if "suv" in full_text or "yomg" in full_text:
-                icons = ["💧", "🌧️", "☁️", "🌱"]
-            elif "qish" in full_text or "qor" in full_text:
+            if ScreenwriterEngine.has_keyword(full_text, ["qish", "qor", "muz"]):
                 icons = ["❄️", "⛄", "🌲", "✨"]
+            elif ScreenwriterEngine.has_keyword(full_text, ["bahor", "gul"]):
+                icons = ["🌸", "🌱", "🦋", "☀️"]
 
             scene["visual_beats"] = [
                 {
                     "time_pct": 0.0,
                     "main_text": clean_title,
-                    "sub_text": narration[:75] if len(narration) > 75 else narration,
+                    "sub_text": part1,
                     "icons": icons,
                     "highlight": False
                 },
                 {
                     "time_pct": 0.55,
                     "main_text": "Tabiat Sabog'i",
-                    "sub_text": narration[75:160] if len(narration) > 75 else narration,
+                    "sub_text": part2,
                     "icons": icons,
                     "highlight": True
                 }
             ]
             return
 
-        # 5. Ranglar va Mevalar
-        if any(w in full_text for w in ["rang", "qizil", "sariq", "yashil", "ko'k", "meva", "olma", "banan", "nok"]):
-            icons = ["🎨", "🔴", "🟡", "🟢"]
-            if "meva" in full_text or "olma" in full_text:
-                icons = ["🍎", "🍌", "🍇", "🍓"]
+        # 4. Hayvonlar va Jonivorlar olami
+        if ScreenwriterEngine.has_keyword(full_text, ["hayvon", "ayiq", "quyon", "tulki", "bo'ri", "sher", "mushuk", "kuchuk", "it", "fil", "baliq", "delfin", "qush"]):
+            icons = ["🐻", "🐰", "🦊", "🦁"]
+            if ScreenwriterEngine.has_keyword(full_text, ["baliq", "delfin", "akula"]):
+                icons = ["🐬", "🌊", "🐠", "🫧"]
+            elif ScreenwriterEngine.has_keyword(full_text, ["qush", "chumchuq", "burgut"]):
+                icons = ["🐦", "🌿", "🐣", "✨"]
+            elif ScreenwriterEngine.has_keyword(full_text, ["mushuk", "kuchuk", "it"]):
+                icons = ["🐱", "🐶", "🐾", "❤️"]
 
             scene["visual_beats"] = [
                 {
                     "time_pct": 0.0,
                     "main_text": clean_title,
-                    "sub_text": narration[:75] if len(narration) > 75 else narration,
+                    "sub_text": part1,
+                    "icons": icons,
+                    "highlight": False
+                },
+                {
+                    "time_pct": 0.55,
+                    "main_text": "Do'stona Tabiat",
+                    "sub_text": part2,
+                    "icons": icons,
+                    "highlight": True
+                }
+            ]
+            return
+
+        # 5. Fazoviy olam / Kosmos va Quyosh sistemasi (FAQAT BUTUN SO'Z!)
+        if ScreenwriterEngine.has_keyword(full_text, ["kosmos", "sayyora", "quyosh sistemasi", "yulduz", "raketa", "koinot", "mars", "saturn", "oy"]):
+            icons = ["🚀", "🌍", "🌕", "⭐"]
+            scene["visual_beats"] = [
+                {
+                    "time_pct": 0.0,
+                    "main_text": clean_title,
+                    "sub_text": part1,
+                    "icons": icons,
+                    "highlight": False
+                },
+                {
+                    "time_pct": 0.55,
+                    "main_text": "Mo'jizaviy Koinot",
+                    "sub_text": part2,
+                    "icons": ["🪐", "✨", "☀️", "🌟"],
+                    "highlight": True
+                }
+            ]
+            return
+
+        # 6. Mevalar va Ranglar
+        if ScreenwriterEngine.has_keyword(full_text, ["meva", "olma", "banan", "nok", "uzum", "anor", "shaftoli", "rang", "qizil", "sariq", "yashil", "ko'k"]):
+            icons = ["🍎", "🍌", "🍇", "🍓"] if ScreenwriterEngine.has_keyword(full_text, ["meva", "olma", "banan", "nok"]) else ["🎨", "🔴", "🟡", "🟢"]
+            scene["visual_beats"] = [
+                {
+                    "time_pct": 0.0,
+                    "main_text": clean_title,
+                    "sub_text": part1,
                     "icons": icons,
                     "highlight": False
                 },
                 {
                     "time_pct": 0.55,
                     "main_text": "Yorqin Dunyo",
-                    "sub_text": narration[75:160] if len(narration) > 75 else narration,
+                    "sub_text": part2,
                     "icons": icons,
                     "highlight": True
                 }
             ]
             return
 
-        # 6. Umumiy va Boshqa barcha ta'limiy mavzular (Doimo matnga mos)
+        # 7. Umumiy va Boshqa barcha ta'limiy mavzular (Doimo butun so'z va matnga mos)
         icons = ["💡", "✨", "📚", "⭐"]
-        if "mashina" in full_text or "poyezd" in full_text:
+        if ScreenwriterEngine.has_keyword(full_text, ["mashina", "poyezd", "avtomobil"]):
             icons = ["🚗", "🚦", "🚂", "✈️"]
-        elif "musiqa" in full_text or "qo'shiq" in full_text:
+        elif ScreenwriterEngine.has_keyword(full_text, ["musiqa", "qo'shiq", "kuy"]):
             icons = ["🎵", "🎶", "🎸", "🎹"]
-        elif "sport" in full_text or "to'p" in full_text:
+        elif ScreenwriterEngine.has_keyword(full_text, ["sport", "to'p", "futbol"]):
             icons = ["⚽", "🏀", "🏃", "🏆"]
 
         scene["visual_beats"] = [
             {
                 "time_pct": 0.0,
                 "main_text": clean_title,
-                "sub_text": narration[:80] if len(narration) > 80 else narration,
+                "sub_text": part1,
                 "icons": icons,
                 "highlight": False
             },
             {
                 "time_pct": 0.55,
                 "main_text": "Foydali Bilim",
-                "sub_text": narration[80:160] if len(narration) > 80 else narration,
+                "sub_text": part2,
                 "icons": icons,
                 "highlight": True
             }
@@ -436,12 +499,52 @@ class ScreenwriterEngine:
 
     @staticmethod
     def _generate_contextual_screenplay(topic, prompt, age_info, total_duration, scene_count, style_info, language):
-        """Aniq va tushunarli virtual o'qituvchi ssenariysi (Offline rejimda ham to'liq ishlaydi)."""
+        """Aniq, jonli va pedagogik virtual o'qituvchi ssenariysi (Offline rejimda ham to'liq ishlaydi)."""
         clean_topic = topic.strip()
         sec_per_scene = round(total_duration / scene_count)
         text_lower = f"{clean_topic} {prompt}".lower()
         
-        # A) Matematika mavzusi (Masalan: 2 ga 2 ni qo'shish)
+        # A) Suv, Tomchivoy va Yomg'ir sarguzashti (Suv aylanishi)
+        if ScreenwriterEngine.has_keyword(text_lower, ["suv", "tomchi", "tomchivoy", "yomg'ir", "bulut", "daryo", "dengiz", "oqim"]):
+            return {
+                "title": f"Tabiat Darsi: {clean_topic}",
+                "moral_summary": "Suv quyosh nuri ostida bug'lanib bulutga aylanadi va yomg'ir bo'lib yerga hayot ulashadi.",
+                "scenes": [
+                    {
+                        "scene_number": 1,
+                        "title": "Jajji Tomchivoy bilan tanishuv",
+                        "duration_seconds": sec_per_scene,
+                        "stage": "hook",
+                        "narration": "Salom, mening jajji do'stim! Katta moviy daryoda quvnoq Tomchivoy yashar ekan. Bir kuni iliq quyosh nuri tushib, u yengil bug'ga aylanib osmonga ucha boshlabdi!",
+                        "visual_prompt": "Cheerful smiling water droplet rising from a blue river towards the warm sun",
+                        "camera_movement": "Sekin yaqinlashish (Dolly In)",
+                        "emotion": "quvnoq"
+                    },
+                    {
+                        "scene_number": 2,
+                        "title": "Momiq bulutlar va sayohat",
+                        "duration_seconds": sec_per_scene,
+                        "stage": "cause",
+                        "narration": "Osmonda u millionlab do'stlari bilan uchrashib, oppoq va momiq bulutga aylanibdi! Shamol bu mehribon bulutni baland tog'lar va yashil vodiylar uzra uzoqlarga uchirib ketibdi.",
+                        "visual_prompt": "Cute water droplets gathering into a friendly fluffy white cloud floating over mountains",
+                        "camera_movement": "Yon tomondan kuzatish (Pan Right)",
+                        "emotion": "hayrat"
+                    },
+                    {
+                        "scene_number": 3,
+                        "title": "Mayin yomg'ir va tabiat quvonchi",
+                        "duration_seconds": sec_per_scene,
+                        "stage": "solution",
+                        "narration": "Bulut to'lishib, yerga shirin yomg'ir bo'lib yog'ibdi! Chanqagan gullar, baland daraxtlar suv ichib quvonishibdi. Tomchivoy yana ona yerga qaytib, tabiatga yangi hayot bag'ishlabdi!",
+                        "visual_prompt": "Gentle rain drops nourishing colorful blooming flowers and a rainbow arc in the sky",
+                        "camera_movement": "Sekin uzoqlashish (Zoom Out)",
+                        "emotion": "quvonch"
+                    }
+                ],
+                "screenplay_author": "KidsVidEdu Virtual O'qituvchi v4.0"
+            }
+
+        # B) Matematika mavzusi (Masalan: 2 ga 2 ni qo'shish)
         if any(w in text_lower for w in ["qo'sh", "+", "matematika", "karra", "2 ga 2", "hisoblash", "son"]):
             return {
                 "title": f"Matematika O'qituvchisi: {clean_topic}",
@@ -481,7 +584,7 @@ class ScreenwriterEngine:
                 "screenplay_author": "KidsVidEdu Virtual O'qituvchi v4.0"
             }
 
-        # B) Daraxtlar va fasllar mavzusi
+        # C) Daraxtlar va fasllar mavzusi
         if any(w in text_lower for w in ["daraxt", "barg", "kuz", "chinor", "oltin"]):
             return {
                 "title": f"Tabiat Darsi: {clean_topic}",
@@ -521,29 +624,122 @@ class ScreenwriterEngine:
                 "screenplay_author": "KidsVidEdu Virtual O'qituvchi v4.0"
             }
 
-        # C) Boshqa har qanday umumiy dars
-        scenes = []
-        stages = [
-            ("Savol va Tushuncha", f"Salom bolajonim! Bugungi darsimizda biz sen bilan birga {clean_topic} mavzusini eng qiziqarli misollar orqali o'rganamiz!"),
-            ("Amaliy Misol va Sir", f"Diqqat bilan qara, bu hodisa qanday yuz berishini bosqichma-bosqich ko'rib chiqamiz. Har bir narsaning o'z sababi va qoidasi bor."),
-            ("Asosiy Xulosa va Saboq", f"Mana, do'stim! Biz muhim qoidani tushunib oldik. Bugun o'rgangan biliming senga hayotda har doim kerak bo'ladi!")
-        ]
-        for i in range(min(scene_count, len(stages))):
-            st_title, st_narr = stages[i]
-            scenes.append({
-                "scene_number": i + 1,
-                "title": st_title,
-                "duration_seconds": sec_per_scene,
-                "stage": f"step_{i+1}",
-                "narration": st_narr,
-                "visual_prompt": f"Clean colorful modern educational explainer illustration about {clean_topic}",
-                "camera_movement": "Sekin yaqinlashish",
-                "emotion": "quvnoq"
-            })
+        # D) Koinot va Sayyoralar mavzusi
+        if ScreenwriterEngine.has_keyword(text_lower, ["kosmos", "sayyora", "quyosh sistemasi", "yulduz", "raketa", "mars", "saturn"]):
+            return {
+                "title": f"Koinot Sirlari: {clean_topic}",
+                "moral_summary": "Bizning Yer sayyoramiz va quyosh sistemasi cheksiz koinotning ajoyib mo'jizasidir.",
+                "scenes": [
+                    {
+                        "scene_number": 1,
+                        "title": "Cheksiz va sirli koinot",
+                        "duration_seconds": sec_per_scene,
+                        "stage": "hook",
+                        "narration": "Salom, yosh astronom do'stim! Tunda osmonga qarab porloq yulduzlarni ko'rganmisan? Koinotda qanchadan-qancha ajoyib sayyoralar borligini bilasanmi?",
+                        "visual_prompt": "Kids looking at starry night sky with twinkling stars and crescent moon",
+                        "camera_movement": "Sekin yaqinlashish (Dolly In)",
+                        "emotion": "hayrat"
+                    },
+                    {
+                        "scene_number": 2,
+                        "title": "Quyosh va uning do'stlari",
+                        "duration_seconds": sec_per_scene,
+                        "stage": "cause",
+                        "narration": "Quyosh atrofida sakkizta ulkan sayyora aylanadi. Biz yashaydigan moviy Yer sayyorasi esa hayot mavjud bo'lgan eng go'zal va yagona makonimizdir!",
+                        "visual_prompt": "Solar system with bright sun in the center and colorful planets orbiting smoothly",
+                        "camera_movement": "Aylanma harakat",
+                        "emotion": "qiziqish"
+                    },
+                    {
+                        "scene_number": 3,
+                        "title": "Orzular va yulduzlar sari",
+                        "duration_seconds": sec_per_scene,
+                        "stage": "solution",
+                        "narration": "Yaxshi o'qisang, kelajakda ulkan raketada kosmosga uchib, yangi yulduzlarni kashf qilishing mumkin! Ilm o'rganish koinot sirlarini ochishga yordam beradi.",
+                        "visual_prompt": "Friendly white cartoon rocket flying past a purple ringed planet with twinkling stars",
+                        "camera_movement": "Sekin uzoqlashish (Zoom Out)",
+                        "emotion": "quvonch"
+                    }
+                ],
+                "screenplay_author": "KidsVidEdu Virtual O'qituvchi v4.0"
+            }
 
+        # E) Jonivorlar va Hayvonlar olami
+        if ScreenwriterEngine.has_keyword(text_lower, ["hayvon", "ayiq", "quyon", "tulki", "bo'ri", "sher", "fil", "jonivor", "o'rmon"]):
+            return {
+                "title": f"Jonivorlar Olami: {clean_topic}",
+                "moral_summary": "Hayvonlar tabiatning ajralmas qismi bo'lib, ularni asrash va mehr ko'rsatish bizning burchimizdir.",
+                "scenes": [
+                    {
+                        "scene_number": 1,
+                        "title": "Do'stona jonivorlar bilan uchrashuv",
+                        "duration_seconds": sec_per_scene,
+                        "stage": "hook",
+                        "narration": "Salom, aziz bolajonim! O'rmon va tabiatda qanday qiziqarli jonivorlar yashashini bilasanmi? Har bir hayvonning o'ziga xos ajoyib xislatlari bor!",
+                        "visual_prompt": "Lush green forest glade with cheerful animals gathered near a crystal stream",
+                        "camera_movement": "Sekin yaqinlashish (Dolly In)",
+                        "emotion": "quvnoq"
+                    },
+                    {
+                        "scene_number": 2,
+                        "title": "Har bir jonivorning o'z siri",
+                        "duration_seconds": sec_per_scene,
+                        "stage": "cause",
+                        "narration": "Ayiqlar qishda shirin uyquga ketadi, chaqqon quyonlar esa xavfdan tezda qochadi. Ular tabiatning muvozanatini saqlashda juda muhim o'rin tutadi.",
+                        "visual_prompt": "Animated forest animals demonstrating their natural habits in a colorful woodland",
+                        "camera_movement": "Yon tomondan kuzatish (Pan Right)",
+                        "emotion": "qiziqish"
+                    },
+                    {
+                        "scene_number": 3,
+                        "title": "Tabiatni va hayvonlarni asraymiz",
+                        "duration_seconds": sec_per_scene,
+                        "stage": "solution",
+                        "narration": "Biz jonivorlarga doimo mehribon bo'lishimiz, tabiatni toza saqlashimiz kerak. Shunda barcha hayvonlar bizning vafodor do'stimiz bo'lib qoladi!",
+                        "visual_prompt": "Smiling child feeding birds in a sunny meadow surrounded by friendly animals",
+                        "camera_movement": "Sekin uzoqlashish (Zoom Out)",
+                        "emotion": "quvonch"
+                    }
+                ],
+                "screenplay_author": "KidsVidEdu Virtual O'qituvchi v4.0"
+            }
+
+        # F) Boshqa har qanday umumiy dars (Boyitilgan, jonli pedagogik matn)
+        scenes = [
+            {
+                "scene_number": 1,
+                "title": f"{clean_topic} bilan tanishuv",
+                "duration_seconds": sec_per_scene,
+                "stage": "hook",
+                "narration": f"Salom, mening aqlli do'stim! Bugun biz sen bilan juda ajoyib va qiziqarli mavzu — {clean_topic} haqida bilib olamiz. Bu qanday yuz berishini hech o'ylab ko'rganmisan?",
+                "visual_prompt": f"Bright engaging educational chalkboard introducing {clean_topic} with vivid colorful elements",
+                "camera_movement": "Sekin yaqinlashish (Dolly In)",
+                "emotion": "hayrat"
+            },
+            {
+                "scene_number": 2,
+                "title": "Qiziqarli hodisa siri",
+                "duration_seconds": sec_per_scene,
+                "stage": "cause",
+                "narration": f"Diqqat bilan qara, tabiatda va hayotda har bir narsaning o'z tartibi va ajoyib sababi bor! {clean_topic} ham bosqichma-bosqich sodir bo'ladi va atrofdagi olamga o'zgacha go'zallik bag'ishlaydi.",
+                "visual_prompt": f"Detailed educational explanation illustration revealing the inner mechanism of {clean_topic}",
+                "camera_movement": "Yon tomondan kuzatish (Pan Right)",
+                "emotion": "qiziqish"
+            },
+            {
+                "scene_number": 3,
+                "title": "Katta saboq va xulosa",
+                "duration_seconds": sec_per_scene,
+                "stage": "solution",
+                "narration": f"Ofarin, do'stim! Bugun biz yangi va foydali bilimni o'rganib oldik. Har bir o'rgangan biliming seni yanada dono va zehnli qiladi. Yangi bilimlarni kashf etishdan aslo to'xtama!",
+                "visual_prompt": f"Celebratory colorful achievement screen with gold stars and cheerful elements for {clean_topic}",
+                "camera_movement": "Sekin uzoqlashish (Zoom Out)",
+                "emotion": "quvonch"
+            }
+        ]
         return {
-            "title": f"{clean_topic} — Virtual Darslik",
-            "moral_summary": f"{clean_topic} mavzusi bo'yicha tushunarli va interaktiv bilim beriladi.",
-            "scenes": scenes,
+            "title": f"Tushunarli Darslik: {clean_topic}",
+            "moral_summary": f"{clean_topic} mavzusini qunt bilan o'rganish bolajonga dunyoni yanada yaxshiroq anglashga yordam beradi.",
+            "scenes": scenes[:scene_count] if scene_count <= len(scenes) else scenes,
             "screenplay_author": "KidsVidEdu Virtual O'qituvchi v4.0"
         }
