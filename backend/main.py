@@ -21,12 +21,36 @@ from backend.screenwriter import ScreenwriterEngine
 from backend.tts_mohirai import MohirAITTSEngine
 from backend.video_engine import GenerativeVideoEngine
 from backend.scene_illustrator import SceneIllustrator
+from backend.quiz_engine import QuizEngine
+
+# Autentifikatsiya, billing va ma'lumotlar bazasi modullari
+from backend.database import init_db, get_db
+from backend.models import User, CreditTransaction, UserVideo
+from backend.auth import get_current_user, get_optional_current_user
+from backend.routes import auth_routes, billing_routes, video_routes, admin_routes
+from backend.topics_store import TopicsStore
+from fastapi import Depends
+from sqlalchemy.orm import Session
 
 app = FastAPI(
-    title="KidsVidEdu API",
-    description="12 yoshgacha bo'lgan bolalar uchun ta'limiy AI video yaratish studiyasi",
-    version="2.0.0"
+    title="TasvirLab Platform API",
+    description="Bolalar va o'smirlar uchun sun'iy intellekt asosida pedagogik xavfsiz ta'limiy video platformasi va professional veb-studiyasi",
+    version="3.5.0"
 )
+
+from backend.telegram_service import TelegramBotWorker
+
+# Ma'lumotlar bazasini ishga tushirish va Telegram bot xizmatini ulash
+@app.on_event("startup")
+async def on_startup():
+    init_db()
+    await TelegramBotWorker.start()
+
+# Marshrutlarni ulash
+app.include_router(auth_routes.router)
+app.include_router(billing_routes.router)
+app.include_router(video_routes.router)
+app.include_router(admin_routes.router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -40,7 +64,7 @@ app.add_middleware(
 async def add_no_cache_headers(request, call_next):
     response = await call_next(request)
     response.headers["Access-Control-Allow-Origin"] = "*"
-    if request.url.path.startswith("/static") or request.url.path == "/" or request.url.path.startswith("/renders") or request.url.path.startswith("/audio"):
+    if request.url.path.startswith("/static") or request.url.path == "/" or request.url.path.startswith("/renders") or request.url.path.startswith("/audio") or request.url.path.startswith("/images"):
         response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
         response.headers["Pragma"] = "no-cache"
         response.headers["Expires"] = "0"
@@ -51,14 +75,17 @@ static_dir = Path(__file__).resolve().parent.parent / "static"
 frontend_dir = Path(__file__).resolve().parent.parent / "frontend"
 renders_dir = static_dir / "renders"
 audio_dir = static_dir / "audio"
+images_dir = static_dir / "images"
 static_dir.mkdir(exist_ok=True)
 frontend_dir.mkdir(exist_ok=True)
 renders_dir.mkdir(exist_ok=True)
 audio_dir.mkdir(exist_ok=True)
+images_dir.mkdir(exist_ok=True)
 
-# /renders va /audio papkalarini mount qilamiz
+# /renders, /audio, /images va /static papkalarini mount qilamiz
 app.mount("/renders", StaticFiles(directory=str(renders_dir)), name="renders")
 app.mount("/audio", StaticFiles(directory=str(audio_dir)), name="audio")
+app.mount("/images", StaticFiles(directory=str(images_dir)), name="images")
 app.mount("/static", StaticFiles(directory=str(frontend_dir)), name="static_frontend")
 
 # Request Models
@@ -99,6 +126,12 @@ class SettingsRequest(BaseModel):
     kling_api_key: Optional[str] = None
     gemini_api_key: Optional[str] = None
 
+class QuizGenerateRequest(BaseModel):
+    topic: str
+    age_group: str = "5-7"
+    screenplay: Optional[Dict[str, Any]] = None
+    api_key: Optional[str] = ""
+
 # Endpoints
 @app.get("/")
 async def serve_index():
@@ -113,7 +146,7 @@ async def get_presets():
         "age_groups": list(AGE_GROUPS.values()),
         "voices": MOHIRAI_VOICES,
         "visual_styles": VISUAL_STYLES,
-        "sample_topics": SAMPLE_TOPICS,
+        "sample_topics": TopicsStore.get_all_topics(),
         "bgm_tracks": BGM_TRACKS,
         "api_status": {
             "mohirai_configured": bool(Config.MOHIRAI_API_KEY),
@@ -154,6 +187,16 @@ async def generate_screenplay(req: ScreenplayRequest):
         "screenplay": screenplay,
         "safety_audit": safety
     }
+
+@app.post("/api/generate-quiz")
+async def generate_quiz(req: QuizGenerateRequest):
+    quiz = await QuizEngine.generate_quiz(
+        topic=req.topic,
+        age_group=req.age_group,
+        screenplay=req.screenplay or {},
+        api_key=req.api_key or ""
+    )
+    return quiz
 
 @app.post("/api/generate-voice")
 async def generate_voice(req: VoiceRequest):
@@ -248,15 +291,12 @@ async def render_video(req: VideoRenderRequest):
     )
     return full_package
 
-@app.post("/api/save-settings")
-async def save_settings(req: SettingsRequest):
-    if req.mohirai_api_key is not None:
-        Config.MOHIRAI_API_KEY = req.mohirai_api_key
-    if req.kling_api_key is not None:
-        Config.KLING_API_KEY = req.kling_api_key
-    if req.gemini_api_key is not None:
-        Config.GEMINI_API_KEY = req.gemini_api_key
-    return {"status": "success", "message": "Sozlamalar yangilandi"}
+@app.post("/api/save-settings", include_in_schema=False)
+async def save_settings():
+    raise HTTPException(
+        status_code=403,
+        detail="Dastur sozlamalari faqat Administrator Boshqaruv Panelida o'zgartirilishi mumkin."
+    )
 
 if __name__ == "__main__":
     import uvicorn

@@ -59,37 +59,64 @@ CRITICAL INSTRUCTIONS:
         }
 
         async with httpx.AsyncClient(timeout=25.0) as client:
-            for model_name in ["gemini-3.1-flash-lite", "gemini-flash-lite-latest", "gemini-flash-latest"]:
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
-                try:
-                    resp = await client.post(url, json=payload)
-                    if resp.status_code == 200:
-                        raw_text = resp.json().get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
-                        raw_text = re.sub(r'^```(?:xml|svg)?\s*', '', raw_text.strip(), flags=re.IGNORECASE)
-                        raw_text = re.sub(r'\s*```$', '', raw_text.strip())
-                        match = re.search(r'(<svg[\s\S]*?</svg>)', raw_text, re.IGNORECASE)
-                        if match:
-                            svg_code = match.group(1).strip()
-                            if 'viewBox' not in svg_code:
-                                svg_code = svg_code.replace('<svg', '<svg viewBox="0 0 1280 720" width="1280" height="720"', 1)
-                            return svg_code
-                except Exception as ex:
-                    print(f"Gemini SVG model {model_name} xatolik: {ex}")
+            resp = await client.post(url, json=payload)
+            if resp.status_code == 200:
+                raw_text = resp.json().get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+                raw_text = re.sub(r'^```(?:xml|svg)?\s*', '', raw_text.strip(), flags=re.IGNORECASE)
+                raw_text = re.sub(r'\s*```$', '', raw_text.strip())
+                match = re.search(r'(<svg[\s\S]*?</svg>)', raw_text, re.IGNORECASE)
+                if match:
+                    svg_code = match.group(1).strip()
+                    # Ensure width and height are 1280x720
+                    if 'viewBox' not in svg_code:
+                        svg_code = svg_code.replace('<svg', '<svg viewBox="0 0 1280 720" width="1280" height="720"', 1)
+                    
+                    # XML to'g'riligini tekshirish va xatolarni avtomatik tuzatish
+                    import xml.etree.ElementTree as ET
+                    try:
+                        ET.fromstring(svg_code)
+                        return svg_code
+                    except Exception:
+                        sanitized = SceneIllustrator._sanitize_svg(svg_code)
+                        try:
+                            ET.fromstring(sanitized)
+                            return sanitized
+                        except Exception as e:
+                            print(f"[SceneIllustrator] Gemini SVG XML xatosi: {e}. Zaxira vektor ishlatiladi.")
+                            return None
         return None
 
     @staticmethod
-    def _has_kw(text: str, keywords: list) -> bool:
-        """Tekst ichidan kalit so'zlarni butun so'z sifatida to'g'ri qidirish ('oy' 'ajoyib' ichida topilmaydi)."""
-        t = f" {text.lower()} "
-        for kw in keywords:
-            k = kw.lower()
-            if len(k) <= 4:
-                if re.search(r'(?<![a-zA-Z\u0400-\u04FF\'])' + re.escape(k) + r'(?![a-zA-Z\u0400-\u04FF\'])', t):
-                    return True
-            else:
-                if k in t:
-                    return True
-        return False
+    def _sanitize_svg(svg_code: str) -> str:
+        """Kichik XML sintaksis xatolarini tuzatish (takrorlangan atributlar, buzilgan teglar)."""
+        # 1. Teg ichida buzilgan boshqa ochiluvchi tegni tozalash
+        svg_code = re.sub(r'<([a-zA-Z0-9_\-]+)[^>]*?(<[a-zA-Z0-9_\-]+)', r'\2', svg_code)
+
+        # 2. Bitta teg ichidagi takroriy atributlarni tozalash (masalan duplicate d="" or r="")
+        def dedupe_tag_attributes(match):
+            full_tag = match.group(0)
+            tag_name_match = re.match(r'<([a-zA-Z0-9_\-]+)', full_tag)
+            if not tag_name_match:
+                return full_tag
+            tag_name = tag_name_match.group(1)
+            is_self_closing = full_tag.strip().endswith('/>')
+
+            attr_matches = list(re.finditer(r'([a-zA-Z0-9_\-:]+)\s*=\s*([\'\"][^\'\"]*[\'\"])', full_tag))
+            seen_attrs = set()
+            kept_attrs = []
+            for m in reversed(attr_matches):
+                key = m.group(1).lower()
+                if key not in seen_attrs:
+                    seen_attrs.add(key)
+                    kept_attrs.append(f'{m.group(1)}={m.group(2)}')
+            kept_attrs.reverse()
+            attrs_str = ' '.join(kept_attrs)
+            if attrs_str:
+                attrs_str = ' ' + attrs_str
+            return f'<{tag_name}{attrs_str} />' if is_self_closing else f'<{tag_name}{attrs_str}>'
+
+        svg_code = re.sub(r'<[a-zA-Z0-9_\-]+(?:\s+[a-zA-Z0-9_\-:]+\s*=\s*[\'\"][^\'\"]*[\'\"])+\s*/?>', dedupe_tag_attributes, svg_code)
+        return svg_code
 
     @staticmethod
     def _generate_contextual_svg(scene: Dict[str, Any], topic: str) -> str:
@@ -98,33 +125,33 @@ CRITICAL INSTRUCTIONS:
         s_num = scene.get('scene_number', 1)
         title = scene.get('title', f'{s_num}-sahna')
 
-        # 1. Suv, tomchi, yomg'ir, daryo, bulut (Birinchi o'ringa qo'yiladi!)
-        if SceneIllustrator._has_kw(text, ['suv', 'tomchi', 'tomchivoy', 'daryo', 'bulut', 'yomg', 'dengiz', 'okean', 'oqim', 'muz']):
-            return SceneIllustrator._draw_water_scene(s_num, scene)
-
-        # 2. Mevalar (olma, banan, nok, anor, uzum, shaftoli)
-        elif SceneIllustrator._has_kw(text, ['olma', 'banan', 'nok', 'anor', 'meva', 'tarvuz', 'shaftoli']):
+        # 1. Mevalar (olma, banan, nok, anor, uzum, shaftoli)
+        if any(w in text for w in ['olma', 'banan', 'nok', 'anor', 'meva', 'tarvuz', 'shaftoli']):
             return SceneIllustrator._draw_fruit_scene(s_num, scene, text)
 
-        # 3. Kuz, daraxtlar, oltin barglar
-        elif SceneIllustrator._has_kw(text, ['daraxt', 'barg', 'kuz', 'chinor', 'oltin', 'fasl', 'xlorofill']):
-            return SceneIllustrator._draw_autumn_scene(s_num, scene)
+        # 2. Samarqand, Registon, O'zbekiston, tarixiy obidalar
+        elif any(w in text for w in ['samarqand', 'registon', 'buxoro', 'xiva', 'toshkent', 'gumbaz', 'minora', 'temur']):
+            return SceneIllustrator._draw_oriental_scene(s_num, scene)
 
-        # 4. Hayvonlar (sher, sichqon, quyon, ayiq, qush, baliq)
-        elif SceneIllustrator._has_kw(text, ['sher', 'sichqon', 'quyon', 'ayiq', 'qush', 'baliq', 'hayvon', 'bo\'ri', 'kuchuk', 'mushuk']):
-            return SceneIllustrator._draw_animal_scene(s_num, scene, text)
-
-        # 5. Koinot, sayyoralar, yulduzlar, raketa (faqat aniq koinot bo'lsa)
-        elif SceneIllustrator._has_kw(text, ['quyosh sistemasi', 'kosmos', 'sayyora', 'yulduz', 'raketa', 'koinot', 'mars', 'saturn', 'oy']):
+        # 3. Koinot, sayyoralar, yulduzlar, raketa
+        elif any(w in text for w in ['quyosh', 'kosmos', 'sayyora', 'yulduz', 'oy', 'raketa', 'koinot']):
             return SceneIllustrator._draw_space_scene(s_num, scene)
 
-        # 6. Robotlar, sun'iy intellekt, texnologiya
-        elif SceneIllustrator._has_kw(text, ['robot', 'sun\'iy intellekt', 'kompyuter', 'texnologiya', 'kiber', 'dasturlash']):
+        # 4. Suv, tomchi, yomg'ir, daryo, bulut
+        elif any(w in text for w in ['suv', 'tomchi', 'daryo', 'bulut', 'yomg', 'dengiz', 'okean']):
+            return SceneIllustrator._draw_water_scene(s_num, scene)
+
+        # 5. Robotlar, sun'iy intellekt, texnologiya
+        elif any(w in text for w in ['robot', 'sun\'iy', 'intellekt', 'kompyuter', 'texnologiya', 'ai']):
             return SceneIllustrator._draw_robot_scene(s_num, scene)
 
-        # 7. Samarqand, Registon, O'zbekiston, tarixiy obidalar
-        elif SceneIllustrator._has_kw(text, ['samarqand', 'registon', 'buxoro', 'xiva', 'toshkent', 'gumbaz', 'minora', 'temur']):
-            return SceneIllustrator._draw_oriental_scene(s_num, scene)
+        # 6. Hayvonlar (sher, sichqon, quyon, ayiq, qush, baliq)
+        elif any(w in text for w in ['sher', 'sichqon', 'quyon', 'ayiq', 'qush', 'baliq', 'hayvon', 'bo\'ri']):
+            return SceneIllustrator._draw_animal_scene(s_num, scene, text)
+
+        # 7. Kuz, daraxtlar, oltin barglar
+        elif any(w in text for w in ['daraxt', 'barg', 'kuz', 'chinor', 'oltin', 'fasl']):
+            return SceneIllustrator._draw_autumn_scene(s_num, scene)
 
         # 8. Umumiy rang-barang tabiat va sahna
         else:
@@ -236,112 +263,33 @@ CRITICAL INSTRUCTIONS:
 
     @staticmethod
     def _draw_water_scene(num: int, scene: Dict[str, Any]) -> str:
-        s_num = num or scene.get("scene_number", 1)
-        if s_num == 2:
-            # 2-sahna: Bug'lanish va Momiq bulutlar
-            return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
-  <defs>
-    <linearGradient id="cloudSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0284C7"/><stop offset="60%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#BAE6FD"/></linearGradient>
-  </defs>
-  <rect width="1280" height="720" fill="url(#cloudSky)"/>
-  
-  <!-- Warm Smiling Sun -->
-  <g transform="translate(1050, 140)">
-    <circle cx="0" cy="0" r="80" fill="#FBBF24"/>
-    <circle cx="0" cy="0" r="65" fill="#F59E0B"/>
-    <circle cx="-18" cy="-10" r="7" fill="#1E293B"/><circle cx="18" cy="-10" r="7" fill="#1E293B"/>
-    <path d="M-15,15 Q0,28 15,15" stroke="#1E293B" stroke-width="4" fill="none"/>
-  </g>
-
-  <!-- Big Fluffy Cloud with Happy Face -->
-  <g transform="translate(600, 200)">
-    <circle cx="-130" cy="30" r="90" fill="#F8FAFC"/>
-    <circle cx="130" cy="30" r="90" fill="#F8FAFC"/>
-    <circle cx="0" cy="0" r="130" fill="#FFFFFF"/>
-    <rect x="-130" y="50" width="260" height="70" fill="#FFFFFF"/>
-    <circle cx="-35" cy="-15" r="9" fill="#0F172A"/><circle cx="35" cy="-15" r="9" fill="#0F172A"/>
-    <ellipse cx="-55" cy="5" rx="10" ry="6" fill="#F43F5E" opacity="0.4"/>
-    <ellipse cx="55" cy="5" rx="10" ry="6" fill="#F43F5E" opacity="0.4"/>
-    <path d="M-20,10 Q0,28 20,10" stroke="#0F172A" stroke-width="4" fill="none"/>
-  </g>
-
-  <!-- Rising Steam and Tiny Flying Droplets -->
-  <g opacity="0.85">
-    <circle cx="320" cy="420" r="22" fill="#E0F2FE"/>
-    <circle cx="480" cy="380" r="28" fill="#BAE6FD"/>
-    <circle cx="760" cy="400" r="24" fill="#E0F2FE"/>
-    <circle cx="890" cy="440" r="18" fill="#BAE6FD"/>
-  </g>
-
-  <!-- Lake Surface below -->
-  <path d="M0,540 Q320,510 640,540 T1280,530 L1280,720 L0,720 Z" fill="#0369A1"/>
-</svg>"""
-        elif s_num >= 3:
-            # 3-sahna: Mayin Yomg'ir, Kamalak va Gullar
-            return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
-  <defs>
-    <linearGradient id="rainSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#BAE6FD"/></linearGradient>
-    <linearGradient id="grassGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4ADE80"/><stop offset="100%" stop-color="#16A34A"/></linearGradient>
-  </defs>
-  <rect width="1280" height="720" fill="url(#rainSky)"/>
-
-  <!-- Rainbow Arc -->
-  <g transform="translate(640, 500)" opacity="0.75">
-    <ellipse cx="0" cy="0" rx="420" ry="300" fill="none" stroke="#EF4444" stroke-width="10"/>
-    <ellipse cx="0" cy="0" rx="410" ry="290" fill="none" stroke="#F97316" stroke-width="10"/>
-    <ellipse cx="0" cy="0" rx="400" ry="280" fill="none" stroke="#FBBF24" stroke-width="10"/>
-    <ellipse cx="0" cy="0" rx="390" ry="270" fill="none" stroke="#10B981" stroke-width="10"/>
-    <ellipse cx="0" cy="0" rx="380" ry="260" fill="none" stroke="#06B6D4" stroke-width="10"/>
-    <ellipse cx="0" cy="0" rx="370" ry="250" fill="none" stroke="#8B5CF6" stroke-width="10"/>
-  </g>
-
-  <!-- Cheerful Rain Droplets -->
-  <g fill="#0284C7" opacity="0.8">
-    <path d="M220,180 C230,195 235,210 230,220 C220,230 205,225 205,215 C205,200 215,185 220,180 Z"/>
-    <path d="M420,130 C430,145 435,160 430,170 C420,180 405,175 405,165 C405,150 415,135 420,130 Z"/>
-    <path d="M820,140 C830,155 835,170 830,180 C820,190 805,185 805,175 C805,160 815,145 820,140 Z"/>
-    <path d="M1020,190 C1030,205 1035,220 1030,230 C1020,240 1005,235 1005,225 C1005,210 1015,195 1020,190 Z"/>
-  </g>
-
-  <!-- Blooming Green Meadow -->
-  <path d="M0,520 Q320,490 640,525 T1280,510 L1280,720 L0,720 Z" fill="url(#grassGrad)"/>
-
-  <!-- Happy Blooming Flower -->
-  <g transform="translate(640, 520)">
-    <circle cx="-16" cy="-16" r="16" fill="#F43F5E"/><circle cx="16" cy="-16" r="16" fill="#F43F5E"/>
-    <circle cx="-16" cy="16" r="16" fill="#F43F5E"/><circle cx="16" cy="16" r="16" fill="#F43F5E"/>
-    <circle cx="0" cy="0" r="18" fill="#FBBF24"/>
-    <circle cx="-5" cy="-4" r="3" fill="#0F172A"/><circle cx="5" cy="-4" r="3" fill="#0F172A"/>
-    <path d="M-4,4 Q0,8 4,4" stroke="#0F172A" stroke-width="2" fill="none"/>
-  </g>
-</svg>"""
-        else:
-            # 1-sahna: Kichik Tomchivoy Qahramon (Jajji Tomchivoy va Iliq Quyosh)
-            return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
+        return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
   <defs>
     <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#BAE6FD"/></linearGradient>
     <linearGradient id="seaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0284C7"/><stop offset="100%" stop-color="#0369A1"/></linearGradient>
     <linearGradient id="dropGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#67E8F9"/><stop offset="100%" stop-color="#0284C7"/></linearGradient>
   </defs>
   <rect width="1280" height="720" fill="url(#skyGrad)"/>
-
-  <!-- Warm Smiling Sun -->
-  <g transform="translate(220, 160)">
-    <circle cx="0" cy="0" r="75" fill="#FBBF24"/>
-    <circle cx="0" cy="0" r="60" fill="#F59E0B"/>
-    <circle cx="-18" cy="-8" r="7" fill="#1E293B"/><circle cx="18" cy="-8" r="7" fill="#1E293B"/>
-    <path d="M-12,12 Q0,24 12,12" stroke="#1E293B" stroke-width="3.5" fill="none"/>
+  
+  <!-- Fluffy Cloud -->
+  <g transform="translate(640, 150)">
+    <circle cx="-70" cy="20" r="60" fill="#F8FAFC"/>
+    <circle cx="70" cy="20" r="60" fill="#F8FAFC"/>
+    <circle cx="0" cy="0" r="85" fill="#FFFFFF"/>
+    <rect x="-70" y="30" width="140" height="50" fill="#FFFFFF"/>
   </g>
 
-  <!-- Big Smiling Water Drop Hero (Tomchivoy) -->
-  <g transform="translate(640, 340) scale(1.45)">
-    <path d="M0,-85 C50,-20 60,35 50,60 C35,85 -35,85 -50,60 C-60,35 -50,-20 0,-85 Z" fill="url(#dropGrad)"/>
+  <!-- Big Smiling Water Drop Hero -->
+  <g transform="translate(640, 360) scale(1.4)">
+    <path d="M0,-80 C50,-20 60,30 50,55 C35,80 -35,80 -50,55 C-60,30 -50,-20 0,-80 Z" fill="url(#dropGrad)"/>
+    <!-- Sparkle on head -->
     <ellipse cx="-18" cy="-20" rx="8" ry="14" fill="#FFFFFF" opacity="0.6" transform="rotate(-25 -18 -20)"/>
+    <!-- Cute Eyes -->
     <circle cx="-16" cy="20" r="7" fill="#0F172A"/><circle cx="-14" cy="18" r="2.5" fill="#FFFFFF"/>
     <circle cx="16" cy="20" r="7" fill="#0F172A"/><circle cx="18" cy="18" r="2.5" fill="#FFFFFF"/>
     <ellipse cx="-25" cy="32" rx="7" ry="4" fill="#F43F5E" opacity="0.5"/>
     <ellipse cx="25" cy="32" rx="7" ry="4" fill="#F43F5E" opacity="0.5"/>
-    <path d="M-10,35 Q0,46 10,35" stroke="#0F172A" stroke-width="3" fill="none"/>
+    <path d="M-10,35 Q0,45 10,35" stroke="#0F172A" stroke-width="3" fill="none"/>
   </g>
 
   <!-- Flowing Blue River below -->

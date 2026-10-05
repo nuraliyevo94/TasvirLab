@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KidsVidEdu — Bolalar uchun Ta'limiy AI Video Studiyasi</title>
+  <title>TasvirLab — Bolalar uchun video darslar yaratish platformasi</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/style.css?v=3.8.0">
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body class="bg-slate-50 relative selection:bg-indigo-500 selection:text-white pb-20">
 
@@ -17,63 +19,89 @@
 
   <!-- Header -->
   <header class="relative z-10 max-w-7xl mx-auto px-4 pt-6 pb-4">
-    <div class="glass-panel px-6 py-4 rounded-3xl flex flex-wrap items-center justify-between gap-4 border border-white/60 shadow-lg">
-      <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-pink-500 to-amber-400 flex items-center justify-center text-2xl shadow-md text-white">
-          ✨
+    <div class="glass-panel px-6 py-4 rounded-3xl flex flex-wrap items-center justify-between gap-4 border border-white/80 shadow-xl">
+      <div class="flex items-center gap-3.5">
+        <div class="relative">
+          <img src="/images/mascot.jpg" alt="TasvirLab Qahramoni" class="w-13 h-13 md:w-14 md:h-14 rounded-2xl object-cover shadow-lg ring-2 ring-indigo-500/30 mascot-avatar">
+          <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full"></span>
         </div>
         <div>
-          <h1 class="font-fredoka text-2xl md:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip-text text-transparent">
-            KidsVidEdu
-          </h1>
-          <p class="text-xs font-semibold text-slate-500">12 yoshgacha bolalar uchun ta'limiy video studiyasi</p>
+          <div class="flex items-center gap-2">
+            <h1 class="font-fredoka text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-indigo-600 via-pink-500 to-amber-500 bg-clip-text text-transparent">
+              TasvirLab
+            </h1>
+            <span class="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-indigo-100 text-indigo-700">Tezkor Video</span>
+          </div>
+          <p class="text-xs font-semibold text-slate-500">Bolalar va o'quvchilar uchun qiziqarli video darslar yaratish dasturi</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
-        <span class="px-3.5 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-bold flex items-center gap-1.5 shadow-sm">
-          <span>🎓</span> Ta'limiy AI Video Platformasi
-        </span>
+      <div class="flex items-center gap-2.5 flex-wrap">
+        <button id="btnOpenPricing" onclick="openPricingModal()" class="px-4 py-2 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-fredoka font-bold text-xs shadow-md hover:shadow-orange-400/30 hover:scale-105 transition-all flex items-center gap-1.5">
+          <span>🪙</span> <span id="headerCreditDisplay">3 ta bepul video</span>
+        </button>
+
+        <button id="btnOpenMyVideos" onclick="openMyVideosModal()" class="px-3.5 py-2 rounded-2xl bg-white border border-slate-200 text-slate-700 hover:text-indigo-600 hover:border-indigo-200 text-xs font-bold transition-all shadow-sm flex items-center gap-1.5">
+          <span>🎬</span> <span class="hidden sm:inline">Videolarim</span>
+          <span id="myVideosBadge" class="hidden px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold">0</span>
+        </button>
+
+        <button id="btnAdminPanel" onclick="openAdminModal()" class="hidden px-3.5 py-2 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-fredoka font-bold text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer">
+          <span>🛡️</span> <span>Admin</span>
+        </button>
+
+        <!-- Foydalanuvchi hisobi / Kirish tugmasi -->
+        <div id="userHeaderArea" class="flex items-center">
+          <button id="btnOpenAuth" onclick="openAuthModal()" class="px-4 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-fredoka font-bold text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer">
+            <span>👤</span> <span>Kirish</span>
+          </button>
+        </div>
       </div>
     </div>
   </header>
 
   <!-- Step Stepper Navigation -->
   <nav class="relative z-10 max-w-5xl mx-auto px-4 my-6">
-    <div class="grid grid-cols-5 gap-2 md:gap-4 text-center">
-      <div id="stepNav1" class="step-item active cursor-pointer" onclick="goToStep(1)">
-        <div class="step-icon w-10 h-10 md:w-12 md:h-12 mx-auto rounded-2xl bg-white text-slate-400 border border-slate-200 flex items-center justify-center font-fredoka font-bold text-base md:text-lg mb-1.5 transition-all">
-          1
-        </div>
-        <div class="text-xs font-bold text-slate-700 truncate">Yosh Toifasi</div>
+    <div class="step-nav-wrapper">
+      <div class="step-nav-line hidden md:block">
+        <div id="stepNavLineFill" class="step-nav-line-fill" style="width: 10%;"></div>
       </div>
 
-      <div id="stepNav2" class="step-item cursor-pointer" onclick="goToStep(2)">
-        <div class="step-icon w-10 h-10 md:w-12 md:h-12 mx-auto rounded-2xl bg-white text-slate-400 border border-slate-200 flex items-center justify-center font-fredoka font-bold text-base md:text-lg mb-1.5 transition-all">
-          2
+      <div class="grid grid-cols-5 gap-2 md:gap-4 text-center">
+        <div id="stepNav1" class="step-item active cursor-pointer" onclick="goToStep(1)">
+          <div class="step-icon w-11 h-11 md:w-13 md:h-13 mx-auto rounded-2xl bg-white text-slate-600 border border-slate-200 flex items-center justify-center font-fredoka font-bold text-base md:text-lg mb-1.5 shadow-sm">
+            1
+          </div>
+          <div class="text-xs font-bold text-slate-700 truncate">Yosh guruhi</div>
         </div>
-        <div class="text-xs font-bold text-slate-700 truncate">Mavzu</div>
-      </div>
 
-      <div id="stepNav3" class="step-item cursor-pointer" onclick="goToStep(3)">
-        <div class="step-icon w-10 h-10 md:w-12 md:h-12 mx-auto rounded-2xl bg-white text-slate-400 border border-slate-200 flex items-center justify-center font-fredoka font-bold text-base md:text-lg mb-1.5 transition-all">
-          3
+        <div id="stepNav2" class="step-item cursor-pointer" onclick="goToStep(2)">
+          <div class="step-icon w-11 h-11 md:w-13 md:h-13 mx-auto rounded-2xl bg-white text-slate-600 border border-slate-200 flex items-center justify-center font-fredoka font-bold text-base md:text-lg mb-1.5 shadow-sm">
+            2
+          </div>
+          <div class="text-xs font-bold text-slate-700 truncate">Mavzu va Uslub</div>
         </div>
-        <div class="text-xs font-bold text-slate-700 truncate">Xavfsizlik</div>
-      </div>
 
-      <div id="stepNav4" class="step-item cursor-pointer" onclick="goToStep(4)">
-        <div class="step-icon w-10 h-10 md:w-12 md:h-12 mx-auto rounded-2xl bg-white text-slate-400 border border-slate-200 flex items-center justify-center font-fredoka font-bold text-base md:text-lg mb-1.5 transition-all">
-          4
+        <div id="stepNav3" class="step-item cursor-pointer" onclick="goToStep(3)">
+          <div class="step-icon w-11 h-11 md:w-13 md:h-13 mx-auto rounded-2xl bg-white text-slate-600 border border-slate-200 flex items-center justify-center font-fredoka font-bold text-base md:text-lg mb-1.5 shadow-sm">
+            3
+          </div>
+          <div class="text-xs font-bold text-slate-700 truncate">Xavfsizlik</div>
         </div>
-        <div class="text-xs font-bold text-slate-700 truncate">Ssenariy</div>
-      </div>
 
-      <div id="stepNav5" class="step-item cursor-pointer" onclick="goToStep(5)">
-        <div class="step-icon w-10 h-10 md:w-12 md:h-12 mx-auto rounded-2xl bg-white text-slate-400 border border-slate-200 flex items-center justify-center font-fredoka font-bold text-base md:text-lg mb-1.5 transition-all">
-          5
+        <div id="stepNav4" class="step-item cursor-pointer" onclick="goToStep(4)">
+          <div class="step-icon w-11 h-11 md:w-13 md:h-13 mx-auto rounded-2xl bg-white text-slate-600 border border-slate-200 flex items-center justify-center font-fredoka font-bold text-base md:text-lg mb-1.5 shadow-sm">
+            4
+          </div>
+          <div class="text-xs font-bold text-slate-700 truncate">Ssenariy</div>
         </div>
-        <div class="text-xs font-bold text-slate-700 truncate">Premyera</div>
+
+        <div id="stepNav5" class="step-item cursor-pointer" onclick="goToStep(5)">
+          <div class="step-icon w-11 h-11 md:w-13 md:h-13 mx-auto rounded-2xl bg-white text-slate-600 border border-slate-200 flex items-center justify-center font-fredoka font-bold text-base md:text-lg mb-1.5 shadow-sm">
+            5
+          </div>
+          <div class="text-xs font-bold text-slate-700 truncate">Tayyor Video</div>
+        </div>
       </div>
     </div>
   </nav>
@@ -97,14 +125,14 @@
       </div>
     </section>
 
-    <!-- STEP 2: Mavzu va Ko'rsatma -->
+    <!-- STEP 2: Mavzu va Uslub -->
     <section id="stepPanel2" class="space-y-6 hidden">
       <div class="text-center max-w-2xl mx-auto mb-6">
         <h2 class="font-fredoka text-3xl font-extrabold text-slate-900 mb-2">
-          Mavzu va Sehrli Ko'rsatma 🪄
+          Video Mavzusi va Ko'rinishi 🎨
         </h2>
         <p class="text-sm text-slate-600">
-          Bolajonlarga nimalarni o'rgatmoqchisiz? Mavzuni yozing yoki quyidagi tayyor ta'limiy shablonlardan birini tanlang.
+          Bolajonlarga nimalarni o'rgatmoqchisiz? Mavzuni o'zingiz yozing yoki pastdagi tavsiya etilgan namunalardan birini tanlang.
         </p>
       </div>
 
@@ -114,52 +142,41 @@
           <label class="block font-fredoka font-bold text-base text-slate-800 mb-2">
             📌 Video Mavzusi:
           </label>
-          <input type="text" id="inputTopic" value="Daraxtlar nega barg to'kadi?"
-                 placeholder="Masalan: Suv tomchisining sarguzashti yoki Oltin kuz fasli"
+          <input type="text" id="inputTopic" name="educational_lesson_topic" value=""
+                 autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                 data-lpignore="true" data-form-type="other" data-1p-ignore="true" data-bwignore="true"
+                 placeholder="Mavzuni o'zingiz yozing yoki pastdagi tavsiya etilgan namunalardan birini tanlang..."
                  class="w-full text-base p-4 rounded-2xl border border-slate-200 bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-semibold text-slate-800 shadow-sm">
         </div>
 
         <!-- Tavsiya etilgan namunaviy mavzular -->
         <div>
           <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-            ⚡ Tavsiya etilgan ta'limiy mavzular:
+            ⚡ Tavsiya etilgan mavzular:
           </label>
           <div id="sampleTopicsContainer" class="flex flex-wrap gap-2">
             <!-- JS orqali to'ldiriladi -->
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
+        <div class="pt-4 border-t border-slate-100 max-w-xl">
           <!-- Davomiylik Slayderi -->
           <div>
             <div class="flex items-center justify-between mb-2">
               <label class="font-fredoka font-bold text-sm text-slate-800">
-                ⏱️ Rejalashtirilgan Davomiylik:
+                ⏱️ Video davomiyligi:
               </label>
               <span id="durationDisplay" class="font-bold text-indigo-600 text-sm bg-indigo-50 px-3 py-1 rounded-xl">
                 45 soniya
               </span>
             </div>
-            <input type="range" id="durationSlider" min="30" max="120" step="15" value="45" class="w-full cursor-pointer">
+            <input type="range" id="durationSlider" min="30" max="180" step="15" value="45" class="w-full cursor-pointer">
             <div class="flex justify-between text-xs text-slate-400 mt-1 font-semibold">
               <span>30 soniya</span>
               <span>45 soniya</span>
               <span>60 soniya</span>
               <span>90 soniya</span>
-            </div>
-          </div>
-
-          <!-- Doimiy pedagogik nutq ovozi -->
-          <div>
-            <label class="block font-fredoka font-bold text-sm text-slate-800 mb-2">
-              🎙️ Darsni O'tuvchi O'qituvchi:
-            </label>
-            <div class="p-3.5 rounded-2xl border border-indigo-200 bg-indigo-50/80 text-slate-800 flex items-center gap-3">
-              <span class="text-2xl">👩‍🏫</span>
-              <div>
-                <div class="font-fredoka font-bold text-indigo-700 text-sm">Pedagogik O'zbek Ovoz (Mohir AI)</div>
-                <div class="text-xs text-slate-500 font-medium">Mehribon, aniq va bolalarbop pedagogik talaffuz</div>
-              </div>
+              <span>180 soniya</span>
             </div>
           </div>
         </div>
@@ -167,21 +184,21 @@
         <!-- Vizual Uslub -->
         <div>
           <label class="block font-fredoka font-bold text-base text-slate-800 mb-3">
-            🎨 Vizual Uslub:
+            🎨 Rasm ko'rinishi (Uslubi):
           </label>
           <div id="visualStylesContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <!-- JS orqali to'ldiriladi -->
           </div>
         </div>
 
-        <!-- Orqa Fon Musiqasi (BGM) -->
+        <!-- Orqa Fon Musiqasi -->
         <div>
           <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
             <div>
               <label class="block font-fredoka font-bold text-base text-slate-800 flex items-center gap-2">
-                <span>🎵</span> Orqa Fon Musiqasi (BGM):
+                <span>🎵</span> Orqa fon musiqasi:
               </label>
-              <span class="text-xs text-slate-500 font-medium">Nutqni to'sib qo'ymaydigan professional studio va bolalarbop orkestr kuylari</span>
+              <span class="text-xs text-slate-500 font-medium">Bolalarga mos, mayin va quvnoq kuylar</span>
             </div>
             <div class="flex items-center gap-2">
               <label for="step2CustomBgmInput" class="cursor-pointer text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm">
@@ -197,64 +214,87 @@
       </div>
     </section>
 
-    <!-- STEP 3: Xavfsizlik va Pedagogik Tahlil -->
+    <!-- STEP 3: Xavfsizlik va Odob Mezonlari -->
     <section id="stepPanel3" class="space-y-6 hidden">
       <div class="text-center max-w-2xl mx-auto mb-6">
         <h2 class="font-fredoka text-3xl font-extrabold text-slate-900 mb-2">
-          Bolalar Xavfsizligi va Odob Tahlili 🛡️
+          Bolalar Uchun Xavfsizlik va Odob Tekshiruvi 🛡️
         </h2>
         <p class="text-sm text-slate-600">
-          Har bir video COPPA standartlari, milliy mentalitet va yosh psixologiyasi filtridan o'tadi.
+          Mavzu bolalar tarbiyasi, odob-axloq va xavfsizlik talablariga mosligi bo'yicha to'liq tekshirildi.
         </p>
       </div>
 
       <div class="glass-panel p-6 md:p-8 rounded-3xl space-y-6">
-        <div class="flex flex-wrap items-center justify-between gap-4 p-5 rounded-2xl bg-indigo-50/70 border border-indigo-100">
-          <div>
-            <h4 class="font-fredoka font-bold text-xl text-slate-800 mb-1">
-              AI Child Safety Shield Xulosasi
-            </h4>
-            <p id="safetyPedagogicalAdvice" class="text-sm text-slate-600">
-              Mavzu tahlil qilinmoqda...
-            </p>
+        <!-- Rasmiy Natija Kartochkasi -->
+        <div id="safetyStatusCard" class="p-5 rounded-2xl flex flex-wrap items-center justify-between gap-4 border transition-all">
+          <div class="flex items-center gap-3.5">
+            <div id="safetyStatusIcon" class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-sm">
+              🛡️
+            </div>
+            <div>
+              <div id="safetyStatusLabel" class="font-fredoka font-bold text-lg text-slate-800">
+                Tekshirilmoqda...
+              </div>
+              <div id="safetyTopicMeta" class="text-xs text-slate-500 font-medium">
+                Mavzu parametrlari baholanmoqda
+              </div>
+            </div>
           </div>
-          <div>
-            <span id="safetyScoreBadge" class="px-4 py-1.5 rounded-full font-fredoka font-bold text-sm bg-emerald-100 text-emerald-700">
-              100% Xavfsiz
-            </span>
+          <div id="safetyStatusBadge">
+            <!-- Badge JS orqali -->
           </div>
         </div>
 
-        <!-- Meter -->
+        <!-- Aniqlangan Ta'limiy Yo'nalishlar -->
         <div>
-          <div class="flex justify-between text-xs font-bold text-slate-500 mb-1.5">
-            <span>XAVFSIZLIK VA PSIXOLOGIK MOSLIK KO'RSATKICHI</span>
-            <span>YUQORI</span>
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <span>✨</span> Aniqlangan ta'limiy va tarbiyaviy yo'nalishlar:
           </div>
-          <div class="w-full h-3 rounded-full bg-slate-200 overflow-hidden">
-            <div id="safetyMeterFill" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 transition-all duration-700" style="width: 100%;"></div>
+          <div id="safetyThemesContainer" class="flex flex-wrap gap-2">
+            <!-- Badges JS orqali -->
           </div>
         </div>
 
-        <!-- Mezonlar ro'yxati -->
-        <ul id="safetyChecksList" class="space-y-2.5">
-          <!-- JS orqali to'ldiriladi -->
-        </ul>
+        <!-- Batafsil Tekshirilgan Mezonlar -->
+        <div>
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+            <span>📋</span> Tekshirilgan xavfsizlik talablari:
+          </div>
+          <div id="safetyChecksGrid" class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+            <!-- JS orqali to'ldiriladi -->
+          </div>
+        </div>
 
-        <div id="safetyWarningsContainer" class="hidden space-y-2">
+        <!-- Pedagogik Xulosa va Maslahat -->
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+          <div class="font-fredoka font-bold text-xs uppercase tracking-wider text-slate-500 mb-1">
+            👩‍🏫 O'qituvchi Maslahati va Xulosa:
+          </div>
+          <p id="safetyPedagogicalAdvice" class="text-sm font-medium text-slate-700 leading-relaxed">
+            Mavzu tekshirilmoqda...
+          </p>
+        </div>
+
+        <!-- Ogohlantirishlar / Qoidabuzarliklar -->
+        <div id="safetyViolationsContainer" class="hidden p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-medium space-y-1">
+          <!-- Xatoliklar -->
+        </div>
+
+        <div id="safetyWarningsContainer" class="hidden p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium space-y-1">
           <!-- Ogohlantirishlar -->
         </div>
       </div>
     </section>
 
-    <!-- STEP 4: Ssenariy va Storyboard -->
+    <!-- STEP 4: Ssenariy va Sahnalar -->
     <section id="stepPanel4" class="space-y-6 hidden">
       <div class="text-center max-w-2xl mx-auto mb-6">
         <h2 class="font-fredoka text-3xl font-extrabold text-slate-900 mb-2">
-          AI Ta'limiy Ssenariy va Storyboard 🎬
+          Video Ssenariysi va Sahnalar 🎬
         </h2>
         <p class="text-sm text-slate-600">
-          Har bir sahna bolalar qalbini rom etuvchi emotsiyalar va pedagogik nutq bilan boyitildi. Kerak bo'lsa tahrirlang!
+          Har bir sahna bolalar uchun qiziqarli, mehrli va tushunarli tilda yozildi. Istasangiz matnlarni o'zgartirishingiz mumkin!
         </p>
       </div>
 
@@ -268,9 +308,6 @@
             Tarbiyaviy saboq
           </p>
         </div>
-        <button onclick="openFlashcardsPrintView()" class="px-4 py-2 rounded-xl bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-50 font-fredoka font-bold text-xs shadow-sm transition-all flex items-center gap-1.5">
-          <span>📋</span> Ta'limiy Flashcard / Storyboard
-        </button>
       </div>
 
       <!-- Sahnalar ro'yxati -->
@@ -290,7 +327,7 @@
             Video Sahnalari Tayyorlanmoqda...
           </h3>
           <p id="renderStatusSub" class="text-xs text-slate-500 font-medium">
-            Mohir AI ovozlari yozilmoqda va multfilm kadrlari chizilmoqda. Iltimos, kuting!
+            O'zbekcha ovoz yozilmoqda va multfilm rasmlari chizilmoqda. Iltimos, biroz kuting!
           </p>
         </div>
 
@@ -313,20 +350,20 @@
         <!-- Ready Action Button -->
         <div class="pt-3 border-t border-slate-100 flex justify-end">
           <button id="btnOpenPremyere" disabled class="px-6 py-3 rounded-2xl bg-slate-300 text-slate-500 font-fredoka font-bold text-sm transition-all cursor-not-allowed flex items-center gap-2">
-            <span>⏳ Tayyorlanishi kutilmoqda...</span>
+            <span>⏳ Video tayyorlanmoqda...</span>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- STEP 5: Video Premyera -->
+    <!-- STEP 5: Video Tomosha -->
     <section id="stepPanel5" class="space-y-6 hidden">
       <div class="text-center max-w-2xl mx-auto mb-6">
         <h2 class="font-fredoka text-3xl font-extrabold text-slate-900 mb-2">
-          KidsVidEdu Cinema Premyera 🍿
+          Tayyor Videoni Tomosha Qilish 🍿
         </h2>
         <p class="text-sm text-slate-600">
-          Barcha sahnalar to'liq tayyor bo'ldi! Mohir AI ovozi va 1080p multfilm animatsiyasidan bahramand bo'ling.
+          Barcha sahnalar to'liq tayyor bo'ldi! O'zbekcha ovoz va yorqin multfilm ko'rinishidan bahramand bo'ling.
         </p>
       </div>
 
@@ -339,7 +376,7 @@
             <span class="w-3 h-3 rounded-full bg-amber-500"></span>
             <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
             <span id="videoTitleDisplay" class="font-fredoka text-sm font-semibold ml-2 text-slate-300">
-              KidsVidEdu Studio Player
+              TasvirLab Video Pleyeri
             </span>
           </div>
           
@@ -349,13 +386,27 @@
             <span class="w-1 bg-indigo-400 h-4 rounded-full"></span>
             <span class="w-1 bg-amber-400 h-3 rounded-full"></span>
             <span class="w-1 bg-emerald-400 h-5 rounded-full"></span>
-            <span class="text-[10px] text-slate-400 ml-1.5 font-bold uppercase">Mohir AI Ovoz</span>
+            <span class="text-[10px] text-slate-400 ml-1.5 font-bold uppercase">O'zbekcha Ovoz</span>
           </div>
         </div>
 
         <!-- Canvas Video Stage (16:9 Aspect Ratio) -->
-        <div class="relative w-full aspect-video rounded-2xl overflow-hidden bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-900 shadow-2xl border border-slate-800">
+        <div class="relative w-full aspect-video rounded-2xl overflow-hidden bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-900 shadow-2xl border border-slate-800 group">
           <canvas id="cinemaCanvas" width="1280" height="720" class="w-full h-full block" style="width: 100%; height: 100%; display: block;"></canvas>
+
+          <!-- Idle Poster Overlay -->
+          <div id="cinemaIdleOverlay" class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-950/40 backdrop-blur-[1px] transition-all cursor-pointer" onclick="togglePlayPause()">
+            <img src="/images/cinema_idle_poster.jpg" alt="Video sahnasi" class="absolute inset-0 w-full h-full object-cover opacity-70">
+            <div class="relative z-20 text-center space-y-3 p-4">
+              <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full bg-gradient-to-tr from-pink-500 to-indigo-600 text-white flex items-center justify-center text-2xl sm:text-4xl shadow-2xl hover:scale-110 active:scale-95 transition-all ring-4 ring-white/30">
+                ▶
+              </div>
+              <div class="bg-slate-950/85 px-4 py-2 rounded-2xl border border-slate-700/80 backdrop-blur-md">
+                <div class="font-fredoka font-bold text-base sm:text-lg text-white">Videoni Ko'rish 🍿</div>
+                <div class="text-[11px] text-slate-300">O'zbekcha nutq va multfilm sahnalarini tomosha qiling</div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Real Hidden HTML5 Audio Elements -->
@@ -375,7 +426,7 @@
             <span id="totalTimeDisplay">00:00</span>
           </div>
 
-          <!-- Audio Mixer & Sidechain Ducking Status Bar -->
+          <!-- Audio Mixer & Ducking Status Bar -->
           <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-slate-900 border border-slate-800 text-xs">
             <div class="flex flex-wrap items-center gap-4">
               <!-- Voice volume -->
@@ -393,13 +444,13 @@
               </div>
             </div>
 
-            <!-- Sidechain Ducking Indicator -->
-            <div class="flex items-center gap-2">
-              <span id="duckingBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 shadow-sm" title="Nutq yangraganda musiqa silliq pasayadi (Sidechain ducking)">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span id="duckingStatusText">Sidechain Ducking: Faol</span>
+            <!-- Ducking Indicator (Ruxsat etilgan qat'iy kenglik - tugmalar joyidan siljimaydi) -->
+            <div class="flex items-center gap-2 shrink-0">
+              <span id="duckingBadge" class="w-48 shrink-0 inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 shadow-sm transition-colors" title="Nutq vaqtida musiqa avtomatik pasayadi">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+                <span id="duckingStatusText" class="truncate">Musiqa me'yorda</span>
               </span>
-              <label for="cinemaCustomBgmInput" class="cursor-pointer px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[11px] font-medium transition-all flex items-center gap-1" title="Kompyuteringizdan maxsus musiqa tanlash">
+              <label for="cinemaCustomBgmInput" class="cursor-pointer px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[11px] font-medium transition-all flex items-center gap-1 shrink-0" title="Kompyuteringizdan maxsus musiqa tanlash">
                 <span>📁</span> O'z musiqangiz
               </label>
               <input type="file" id="cinemaCustomBgmInput" accept="audio/*" class="hidden" onchange="handleCustomBgmUpload(event)">
@@ -409,7 +460,7 @@
           <div class="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-slate-900">
             <div class="flex items-center gap-3">
               <button id="btnPlayPause" class="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-pink-600 text-white font-fredoka font-bold text-sm shadow-lg hover:shadow-indigo-500/30 transition-all flex items-center gap-2">
-                <span>▶️</span> <span>Ijro etish</span>
+                <span>▶️</span> <span>Ko'rish</span>
               </button>
               <button id="btnRestart" class="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-200 font-semibold text-xs border border-slate-800 transition-all flex items-center gap-1.5">
                 <span>🔄</span> Boshidan
@@ -439,11 +490,14 @@
             </div>
 
             <div class="flex items-center gap-2">
-              <button onclick="openFlashcardsPrintView()" class="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-200 font-fredoka font-bold text-xs border border-slate-700 shadow-md transition-all flex items-center gap-1.5" title="Darsni chop etish uchun varaq">
-                <span>📋</span> Flashcard
+              <button onclick="openQuizModal()" class="px-4 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-fredoka font-bold text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer" title="Dars bo'yicha savol-javob va viktorina">
+                <span>🧠</span> Viktorina
               </button>
-              <button id="btnDownload" class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-fredoka font-bold text-xs shadow-lg transition-all flex items-center gap-2">
-                <span>📥</span> Ovozli Videoni Yuklab Olish
+              <button onclick="openFlashcardsPrintView()" class="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-200 font-fredoka font-bold text-xs border border-slate-700 shadow-md transition-all flex items-center gap-1.5" title="Dars uchun tarqatma varaqni chop etish">
+                <span>📄</span> Qog'ozga chiqarish
+              </button>
+              <button id="btnDownload" class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-fredoka font-bold text-xs shadow-lg transition-all flex items-center gap-2 cursor-pointer" title="Serverda 1080p Full HD MP4 formatda render qilib yuklab olish">
+                <span>🎬</span> 1080p MP4 Yuklab Olish
               </button>
             </div>
           </div>
@@ -462,8 +516,19 @@
       <button id="btnNext" class="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-pink-600 text-white font-fredoka font-bold text-base shadow-xl hover:shadow-indigo-500/25 transition-all flex items-center gap-2">
         <span>Davom etish</span> <span>→</span>
       </button>
-    </div>
   </main>
+
+  <!-- Sayt Pastki Qismi (Footer) -->
+  <footer class="relative z-10 max-w-5xl mx-auto px-4 mt-14 text-center text-xs text-slate-400 pb-8 space-y-2 border-t border-slate-200/80 pt-6">
+    <div class="flex items-center justify-center gap-4 flex-wrap">
+      <span>© 2026 TasvirLab — Bolalar uchun video ta'lim platformasi</span>
+      <span>•</span>
+      <button onclick="handleFooterAdminClick()" class="text-slate-500 hover:text-indigo-600 font-semibold transition-colors cursor-pointer flex items-center gap-1">
+        <span>🛡️</span> <span>Boshqaruv (Admin)</span>
+      </button>
+    </div>
+    <p class="text-[11px] text-slate-400">Har bir bola uchun mehr va bilim bilan tayyorlandi ✨</p>
+  </footer>
 
   <!-- Loading Modal -->
   <div id="loadingModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
@@ -471,7 +536,7 @@
       <div class="w-16 h-16 mx-auto rounded-3xl bg-indigo-100 flex items-center justify-center text-3xl animate-bounce">
         ✨
       </div>
-      <h3 class="font-fredoka text-xl font-bold text-slate-900">KidsVidEdu AI Studiyasi</h3>
+      <h3 class="font-fredoka text-xl font-bold text-slate-900">TasvirLab</h3>
       <p id="loadingMessage" class="text-sm text-slate-600 leading-relaxed font-medium">
         Jarayon bajarilmoqda...
       </p>
@@ -481,46 +546,657 @@
     </div>
   </div>
 
-  <!-- Settings Modal -->
-  <div id="settingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="glass-panel p-6 md:p-8 rounded-3xl max-w-lg w-full space-y-5 bg-white shadow-2xl">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <h3 class="font-fredoka text-xl font-bold text-slate-900">⚙️ AI API Sozlamalari</h3>
-        <button id="btnCloseSettings" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+  <!-- Pricing / Tariflar & Balans Modal -->
+  <div id="pricingModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-panel p-6 md:p-8 rounded-3xl max-w-3xl w-full space-y-6 bg-white shadow-2xl max-h-[90vh] overflow-y-auto modal-animate">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl font-bold">
+            🪙
+          </div>
+          <div>
+            <h3 class="font-fredoka text-2xl font-bold text-slate-900">Tariflar va Video Imkoniyatlari</h3>
+            <p class="text-xs text-slate-500">O'zbekistondagi eng qulay to'lov tizimlari (Payme, Click) orqali hisobni to'ldirish</p>
+          </div>
+        </div>
+        <button onclick="closePricingModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold p-1">✕</button>
       </div>
 
-      <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 font-medium">
-        ✓ <strong>Mohir AI</strong> va <strong>Google Gemini</strong> API kalitlari ulangan va faol!
-      </div>
-
-      <div class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">
-            🇺🇿 Mohir AI API Key (O'zbekcha TTS):
-          </label>
-          <input type="password" id="inputMohirAIKey" placeholder="91d02f40-..."
-                 class="w-full p-3 rounded-xl border border-slate-200 text-xs font-mono outline-none focus:border-indigo-600">
+      <!-- VIEW 1: Tarif paketlari ro'yxati -->
+      <div id="pricingPackagesView" class="space-y-6">
+        <div class="p-4 rounded-2xl bg-indigo-50/80 border border-indigo-100 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-indigo-700">Sizdagi Imkoniyatlar</span>
+            <div class="text-2xl font-fredoka font-bold text-indigo-950 flex items-center gap-2">
+              <span>✨</span> <span id="modalCreditCount">3 ta video</span>
+              <span class="text-xs font-semibold text-emerald-600 bg-emerald-100 px-2.5 py-0.5 rounded-full">Faol</span>
+            </div>
+          </div>
+          <div class="text-xs text-slate-600 max-w-xs">
+            Har bir to'liq video dars, o'zbekcha ovoz va musiqa bilan tayyorlanishi uchun 1 ta imkoniyat sarflanadi.
+          </div>
         </div>
 
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">
-            🧠 Gemini API Key (Google AI Studio):
-          </label>
-          <input type="password" id="inputGeminiKey" placeholder="AIzaSy..."
-                 class="w-full p-3 rounded-xl border border-slate-200 text-xs font-mono outline-none focus:border-indigo-600">
-          <p class="text-[11px] text-slate-400 mt-1">
-            Bepul kalit olish: <a href="https://aistudio.google.com/apikey" target="_blank" class="text-indigo-600 underline font-semibold">aistudio.google.com/apikey</a> (AIzaSy... bilan boshlanadi)
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="pricingCardsList">
+          <!-- JS orqali tarif paketlari to'ldiriladi -->
+        </div>
+      </div>
+
+      <!-- VIEW 2: To'lov tizimini tanlash va to'lovga o'tish (Checkout) -->
+      <div id="pricingCheckoutView" class="space-y-6 hidden">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <button onclick="backToPricingPackages()" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 cursor-pointer">
+            <span>←</span> <span>Boshqa paketni tanlash</span>
+          </button>
+          <span class="text-xs font-semibold text-slate-400">Xavfsiz to'lov</span>
+        </div>
+
+        <!-- Tanlangan paket ma'lumotlari -->
+        <div id="checkoutSelectedPackageCard" class="p-5 rounded-2xl bg-gradient-to-r from-indigo-50 via-pink-50 to-amber-50 border border-indigo-100 flex items-center justify-between">
+          <div class="flex items-center gap-3.5">
+            <span id="checkoutPkgIcon" class="text-3xl">⭐</span>
+            <div>
+              <h4 id="checkoutPkgName" class="font-fredoka font-bold text-base text-slate-900">Oila To'plami</h4>
+              <p id="checkoutPkgCredits" class="text-xs font-semibold text-indigo-600">+20 ta video dars</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="text-[10px] text-slate-500 uppercase block font-semibold">To'lov summasi</span>
+            <span id="checkoutPkgPrice" class="text-xl font-fredoka font-extrabold text-slate-900">45 000 so'm</span>
+          </div>
+        </div>
+
+        <!-- To'lov usullari (Payme, Click, Uzum, Paynet) -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-2.5">To'lov usulini tanlang:</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <button id="payProviderPaymeBtn" onclick="selectPaymentProvider('payme')" class="p-3.5 rounded-2xl border-2 border-teal-500 bg-teal-50/70 shadow-sm flex flex-col items-center justify-center gap-2 transition-all cursor-pointer ring-2 ring-teal-200 hover:scale-[1.02]">
+              <div class="h-8 flex items-center justify-center px-1">
+                <img src="/images/payme_logo.svg" alt="Payme" class="h-6 max-w-[95px] w-auto object-contain pointer-events-none select-none">
+              </div>
+              <span class="text-[10px] font-bold text-teal-700 bg-teal-100/90 px-2.5 py-0.5 rounded-full">Karta / Ilova</span>
+            </button>
+
+            <button id="payProviderClickBtn" onclick="selectPaymentProvider('click')" class="p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:bg-slate-50 flex flex-col items-center justify-center gap-2 transition-all cursor-pointer hover:scale-[1.02]">
+              <div class="h-8 flex items-center justify-center px-1">
+                <img src="/images/click_logo.svg" alt="Click" class="h-5 max-w-[95px] w-auto object-contain pointer-events-none select-none">
+              </div>
+              <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">Click Up</span>
+            </button>
+
+            <button id="payProviderUzumBtn" onclick="selectPaymentProvider('uzum')" class="p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:bg-slate-50 flex flex-col items-center justify-center gap-2 transition-all cursor-pointer hover:scale-[1.02]">
+              <div class="h-8 flex items-center justify-center px-1">
+                <img src="/images/uzum_logo.png" alt="Uzum" class="h-6 max-w-[95px] w-auto object-contain pointer-events-none select-none">
+              </div>
+              <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">Bank / Karta</span>
+            </button>
+
+            <button id="payProviderPaynetBtn" onclick="selectPaymentProvider('paynet')" class="p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:bg-slate-50 flex flex-col items-center justify-center gap-2 transition-all cursor-pointer hover:scale-[1.02]">
+              <div class="h-8 flex items-center justify-center px-1">
+                <img src="/images/paynet_logo.svg" alt="Paynet" class="h-5 max-w-[95px] w-auto object-contain pointer-events-none select-none">
+              </div>
+              <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">Ilova / Kassa</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- To'lov tugmalari -->
+        <div class="space-y-3 pt-1">
+          <button id="btnProceedPayment" onclick="proceedToPaymentGateway()" class="w-full py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-fredoka font-bold text-sm shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2">
+            <span id="btnProceedPaymentText">Payme orqali 45 000 so'm to'lash</span>
+            <span>→</span>
+          </button>
+
+        </div>
+
+        <!-- To'lov kutilmoqda holati (yashirin) -->
+        <div id="checkoutWaitingBox" class="p-4 bg-sky-50 border border-sky-200 rounded-2xl text-xs text-sky-900 text-center space-y-2 hidden">
+          <div class="flex items-center justify-center gap-2 font-bold text-sky-800">
+            <span class="animate-spin inline-block text-base">⏳</span>
+            <span>To'lov amalga oshirilishi kutilmoqda...</span>
+          </div>
+          <p class="text-[11px] text-sky-700 leading-relaxed">
+            Ilovada to'lovni tasdiqlashingiz bilanoq balansingizga video darslar avtomatik qo'shiladi.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Videos / Mening Videolarim Modal -->
+  <div id="myVideosModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-panel p-6 md:p-8 rounded-3xl max-w-3xl w-full space-y-6 bg-white shadow-2xl max-h-[90vh] overflow-y-auto modal-animate">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl font-bold">
+            🎬
+          </div>
+          <div>
+            <h3 class="font-fredoka text-2xl font-bold text-slate-900">Mening Yaratgan Videolarim</h3>
+            <p class="text-xs text-slate-500">Siz tayyorlagan barcha video darslar ro'yxati</p>
+          </div>
+        </div>
+        <button onclick="closeMyVideosModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold p-1">✕</button>
+      </div>
+
+      <div id="myVideosContainer" class="space-y-3">
+        <!-- JS orqali to'ldiriladi -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Quiz / Viktorina Modal -->
+  <div id="quizModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-panel p-6 md:p-8 rounded-3xl max-w-2xl w-full space-y-5 bg-white shadow-2xl max-h-[92vh] overflow-y-auto modal-animate border border-slate-100">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-2xl font-bold">
+            🧠
+          </div>
+          <div>
+            <h3 id="quizModalTitle" class="font-fredoka text-xl sm:text-2xl font-bold text-slate-900">Darslik Viktorinasi</h3>
+            <p id="quizModalSub" class="text-xs text-slate-500">Dars mavzusi bo'yicha qiziqarli savol-javoblar</p>
+          </div>
+        </div>
+        <button onclick="closeQuizModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold p-1 cursor-pointer">✕</button>
+      </div>
+
+      <!-- Quiz Content Area -->
+      <div id="quizContainer" class="space-y-4">
+        <!-- JS orqali to'ldiriladi -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth Modal (Kirish va Ro'yxatdan o'tish) -->
+  <div id="authModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-panel p-6 md:p-8 rounded-3xl max-w-md w-full space-y-5 bg-white shadow-2xl modal-animate border border-slate-100">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-xl font-bold">
+            👤
+          </div>
+          <div>
+            <h3 class="font-fredoka text-xl font-bold text-slate-900">TasvirLab ga Kirish</h3>
+            <p class="text-[11px] text-slate-500 font-medium">Barcha video darslaringiz bir joyda</p>
+          </div>
+        </div>
+        <button onclick="closeAuthModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold p-1 cursor-pointer">✕</button>
+      </div>
+
+      <!-- Auth Tabs -->
+      <div class="flex p-1 bg-slate-100 rounded-2xl text-xs font-bold font-fredoka text-slate-600 gap-1">
+        <button id="authTabPhoneBtn" onclick="switchAuthTab('phone')" class="flex-1 py-2 rounded-xl bg-white text-indigo-600 shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5">📱 <span>Telefon</span></button>
+        <button id="authTabGoogleBtn" onclick="switchAuthTab('google')" class="flex-1 py-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer flex items-center justify-center gap-1.5">
+          <svg class="w-3.5 h-3.5 inline shrink-0" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+          <span>Google</span>
+        </button>
+        <button id="authTabTelegramBtn" onclick="switchAuthTab('telegram')" class="flex-1 py-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer flex items-center justify-center gap-1.5">
+          <svg class="w-3.5 h-3.5 inline shrink-0 fill-[#229ED9]" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.56 2.94-1.28 4.9-2.12 5.88-2.54 2.8-1.2 3.38-1.41 3.76-1.42.08 0 .28.02.4.12.1.08.13.2.14.28-.01.07-.01.21-.03.37z"/></svg>
+          <span>Telegram</span>
+        </button>
+        <button id="authTabPasswordBtn" onclick="switchAuthTab('password')" class="flex-1 py-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer flex items-center justify-center gap-1.5">🔑 <span>Parol</span></button>
+      </div>
+
+      <!-- TAB 1: Telefon (SMS OTP) -->
+      <div id="authTabPhone" class="space-y-4">
+        <div class="p-3 bg-indigo-50/80 border border-indigo-100 rounded-2xl text-xs text-indigo-900 flex items-center gap-2.5">
+          <span class="text-lg">🎁</span>
+          <span>Yangi ro'yxatdan o'tganlarga <strong>3 ta bepul video</strong> bonusi beriladi!</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1.5">Telefon raqamingiz:</label>
+          <input type="tel" id="authPhoneInput" placeholder="+998 90 123 45 67" value="+998"
+                 class="w-full p-3 rounded-2xl border border-slate-200 text-sm font-semibold outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100">
+        </div>
+
+        <div id="authOtpSection" class="space-y-2 hidden">
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">SMS tasdiqlash kodi:</label>
+          <input type="text" id="authOtpInput" placeholder="123456" maxlength="6"
+                 class="w-full p-3 rounded-2xl border border-slate-200 text-center text-lg font-mono tracking-widest font-bold outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100">
+          <p id="authOtpHint" class="text-[11px] text-slate-500 text-center"></p>
+        </div>
+
+        <button id="authPhoneSubmitBtn" onclick="handlePhoneAuthStep()"
+                class="w-full py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-fredoka font-bold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2">
+          <span>SMS kodni olish</span> <span>→</span>
+        </button>
+
+      </div>
+
+      <!-- TAB 2: Google Sign-In -->
+      <div id="authTabGoogle" class="space-y-4 hidden">
+        <p class="text-xs text-slate-600 leading-relaxed text-center">
+          Google hisobingiz orqali 1 bosishda xavfsiz kiring. Ismingiz va profilingiz avtomatik ulanadi.
+        </p>
+
+        <div id="googleAuthActionArea" class="space-y-3">
+          <!-- Rasmiy Google tugmasi joylashadigan konteyner -->
+          <div id="googleOfficialBtnContainer" class="flex justify-center items-center w-full min-h-[44px]"></div>
+
+          <!-- Zaxira tugmasi (faqat rasmiy tugma yuklanmasa chiqadi) -->
+          <button id="googleCustomBtn" onclick="handleGoogleSignIn()" class="w-full py-3.5 px-4 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm shadow-sm transition-all flex items-center justify-center gap-3 cursor-pointer hidden">
+            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            <span id="googleCustomBtnLabel">Google orqali kiring</span>
+          </button>
+        </div>
+
+
+        <div id="googleTroubleshootBox" class="p-3 bg-amber-50 border border-amber-200 rounded-2xl text-[11px] text-amber-900 space-y-1.5 hidden">
+          <div class="font-bold flex items-center gap-1.5">
+            <span>⚠️</span> <span>Google oynasi ochilmadimi?</span>
+          </div>
+          <p class="leading-relaxed">
+            Google Cloud Console'da <strong>Authorized JavaScript origins</strong> ga <code>http://localhost:8000</code> va <code>http://127.0.0.1:8000</code> ikkalasi ham kiritilganiga hamda <strong>Test users</strong> ga emailingiz qo'shilganiga ishonch hosil qiling.
           </p>
         </div>
       </div>
 
-      <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
-        <button id="btnSaveSettings" class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs shadow-md hover:bg-indigo-700 transition-all">
-          Saqlash
+      <!-- TAB 3: Telegram Auth -->
+      <div id="authTabTelegram" class="space-y-4 hidden">
+        <p class="text-xs text-slate-600 leading-relaxed text-center">
+          Telegram orqali profilingizni tasdiqlang va darhol darslar yaratishni boshlang.
+        </p>
+
+        <div id="telegramActionContainer" class="space-y-3">
+          <button id="btnStartTelegramAuth" onclick="handleTelegramSignIn()" class="w-full py-3.5 px-4 rounded-2xl bg-[#229ED9] hover:bg-[#1E88E5] text-white font-bold text-sm shadow-md transition-all flex items-center justify-center gap-3 cursor-pointer">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.56 2.94-1.28 4.9-2.12 5.88-2.54 2.8-1.2 3.38-1.41 3.76-1.42.08 0 .28.02.4.12.1.08.13.2.14.28-.01.07-.01.21-.03.37z"/>
+            </svg>
+            <span id="tgBtnLabel">@TasvirLabbot orqali Tasdiqlash</span>
+          </button>
+        </div>
+
+        <div id="telegramWaitingBox" class="p-3.5 bg-sky-50 border border-sky-200 rounded-2xl text-xs text-sky-900 text-center space-y-2 hidden">
+          <div class="flex items-center justify-center gap-2 font-bold text-sky-800">
+            <span class="animate-spin inline-block text-base">⏳</span>
+            <span>Telegram botda tasdiqlashingiz kutilmoqda...</span>
+          </div>
+          <p class="text-[11px] text-sky-700 leading-relaxed">
+            Telegram ochilgach, pastdagi <strong>"Start" (Boshlash)</strong> tugmasini bosing. Shunda profilingiz avtomatik tasdiqlanadi.
+        </div>
+      </div>
+
+      <!-- TAB 4: Parol / Admin yagona kirish -->
+      <div id="authTabPassword" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1.5">Login yoki Telefon raqam:</label>
+          <input type="text" id="authLoginInput" placeholder="admin yoki +998901234567"
+                 class="w-full p-3 rounded-2xl border border-slate-200 text-sm font-semibold outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1.5">Parolingiz:</label>
+          <input type="password" id="authPasswordInput" placeholder="••••••••"
+                 class="w-full p-3 rounded-2xl border border-slate-200 text-sm font-semibold outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100">
+        </div>
+
+        <button onclick="handlePasswordAuth()" class="w-full py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-fredoka font-bold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2">
+          <span>Tizimga kirish</span> <span>→</span>
+        </button>
+
+        <p class="text-[11px] text-slate-400 text-center leading-relaxed">
+          💡 Eslatma: Administrator logini va paroli kiritilganda tizim avtomatik tarzda boshqaruv markazini ochadi.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Administrator Boshqaruv Markazi (Admin Dashboard Modal) -->
+  <div id="adminModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-panel p-6 md:p-8 rounded-3xl max-w-4xl w-full space-y-6 bg-white shadow-2xl max-h-[92vh] overflow-y-auto modal-animate border border-slate-100">
+      <!-- Admin Header -->
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center text-2xl font-bold">
+            🛡️
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-fredoka text-xl sm:text-2xl font-bold text-slate-900">Administrator Markazi</h3>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 uppercase tracking-wider">Boshqaruv</span>
+            </div>
+            <p class="text-xs text-slate-500">Statistika, foydalanuvchilar, dars tavsiyalari va iqtisodiy monitoring</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="adminLogout()" class="px-3.5 py-1.5 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-bold transition-all cursor-pointer flex items-center gap-1">
+            <span>🚪</span> <span>Chiqish</span>
+          </button>
+          <button onclick="closeAdminModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold p-1 cursor-pointer">✕</button>
+        </div>
+      </div>
+
+      <!-- Admin Tabs Navigation -->
+      <div class="flex flex-wrap gap-2 border-b border-slate-100 pb-2">
+        <button id="adminTabBtnOverview" onclick="switchAdminTab('overview')" class="px-4 py-2 rounded-2xl font-fredoka font-bold text-xs bg-indigo-600 text-white shadow-sm transition-all cursor-pointer flex items-center gap-1.5">
+          <span>📊</span> <span>Umumiy & Iqtisodiyot</span>
+        </button>
+        <button id="adminTabBtnUsers" onclick="switchAdminTab('users')" class="px-4 py-2 rounded-2xl font-fredoka font-bold text-xs bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all cursor-pointer flex items-center gap-1.5">
+          <span>👥</span> <span>Foydalanuvchilar</span>
+        </button>
+        <button id="adminTabBtnTopics" onclick="switchAdminTab('topics')" class="px-4 py-2 rounded-2xl font-fredoka font-bold text-xs bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all cursor-pointer flex items-center gap-1.5">
+          <span>💡</span> <span>Tavsiyaviy Mavzular</span>
+        </button>
+        <button id="adminTabBtnIntegrations" onclick="switchAdminTab('integrations')" class="px-4 py-2 rounded-2xl font-fredoka font-bold text-xs bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all cursor-pointer flex items-center gap-1.5">
+          <span>⚙️</span> <span>Integratsiyalar & API</span>
+        </button>
+      </div>
+
+      <!-- TAB 1: Overview & Economics -->
+      <div id="adminTabOverview" class="space-y-6">
+        <!-- 4 KPI Cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
+            <span class="text-xs font-semibold text-indigo-600 block mb-1">👥 Foydalanuvchilar</span>
+            <div id="adminStatUsers" class="text-2xl font-fredoka font-bold text-slate-800">0</div>
+            <span id="adminStatUsersToday" class="text-[11px] text-indigo-700 font-medium">Bugun: 0 ta yangi</span>
+          </div>
+          <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
+            <span class="text-xs font-semibold text-emerald-600 block mb-1">💰 Jami Tushum</span>
+            <div id="adminStatRevenue" class="text-2xl font-fredoka font-bold text-slate-800">0 so'm</div>
+            <span class="text-[11px] text-emerald-700 font-medium">Payme / Click orqali</span>
+          </div>
+          <div class="p-4 rounded-2xl bg-amber-50 border border-amber-100">
+            <span class="text-xs font-semibold text-amber-600 block mb-1">🪙 Kreditlar Aylanishi</span>
+            <div id="adminStatCreditsSpent" class="text-2xl font-fredoka font-bold text-slate-800">0</div>
+            <span id="adminStatCreditsBalance" class="text-[11px] text-amber-700 font-medium">Qoldiq balans: 0</span>
+          </div>
+          <div class="p-4 rounded-2xl bg-pink-50 border border-pink-100">
+            <span class="text-xs font-semibold text-pink-600 block mb-1">🎬 Yaratilgan Videolar</span>
+            <div id="adminStatVideos" class="text-2xl font-fredoka font-bold text-slate-800">0 ta</div>
+            <span id="adminStatVideosToday" class="text-[11px] text-pink-700 font-medium">Bugun: 0 ta dars</span>
+          </div>
+        </div>
+
+        <!-- Providers Breakdown & System Health -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-5 rounded-2xl border border-slate-100 bg-slate-50 space-y-3">
+            <h4 class="font-fredoka font-bold text-sm text-slate-800 flex items-center gap-1.5">
+              <span>📱</span> <span>Kirish Turlari Taqsimoti</span>
+            </h4>
+            <div id="adminProvidersBreakdown" class="space-y-2 text-xs">
+              <!-- JS orqali to'ldiriladi -->
+            </div>
+          </div>
+
+          <div class="p-5 rounded-2xl border border-slate-100 bg-slate-50 space-y-3">
+            <h4 class="font-fredoka font-bold text-sm text-slate-800 flex items-center gap-1.5">
+              <span>⚡</span> <span>Tizim va API Holati</span>
+            </h4>
+            <div id="adminSystemHealthArea" class="space-y-2 text-xs">
+              <!-- JS orqali to'ldiriladi -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Users Management -->
+      <div id="adminTabUsers" class="space-y-4 hidden">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div class="relative flex-1 max-w-sm">
+            <input type="text" id="adminUsersSearchInput" onkeyup="handleAdminUsersSearch(event)" placeholder="Telefon, ism yoki email bo'yicha qidirish..."
+                   class="w-full py-2.5 px-4 pr-9 rounded-xl border border-slate-200 text-xs outline-none focus:border-indigo-600">
+            <span class="absolute right-3 top-2.5 text-slate-400 text-xs">🔍</span>
+          </div>
+          <button onclick="loadAdminUsers()" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all cursor-pointer flex items-center gap-1">
+            <span>🔄</span> <span>Yangilash</span>
+          </button>
+        </div>
+
+        <div class="overflow-x-auto rounded-2xl border border-slate-200">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-100 text-slate-600 font-bold border-b border-slate-200">
+                <th class="p-3">ID</th>
+                <th class="p-3">Foydalanuvchi</th>
+                <th class="p-3">Provayder</th>
+                <th class="p-3">Balans</th>
+                <th class="p-3">Videolar</th>
+                <th class="p-3">Holat</th>
+                <th class="p-3 text-right">Amallar</th>
+              </tr>
+            </thead>
+            <tbody id="adminUsersTableBody" class="divide-y divide-slate-100">
+              <!-- JS orqali to'ldiriladi -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 3: Recommended Topics Management -->
+      <div id="adminTabTopics" class="space-y-5 hidden">
+        <!-- Yangi mavzu qo'shish formasi -->
+        <div class="p-5 rounded-2xl border border-indigo-100 bg-indigo-50/50 space-y-3">
+          <h4 class="font-fredoka font-bold text-sm text-indigo-950 flex items-center gap-1.5">
+            <span>➕</span> <span>Yangi Tavsiyaviy Mavzu Qo'shish</span>
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Yosh toifasi:</label>
+              <select id="adminNewTopicAge" class="w-full p-2.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold outline-none focus:border-indigo-600">
+                <option value="2-4">2 – 4 yosh (Kichkintoylar)</option>
+                <option value="5-7" selected>5 – 7 yosh (Bog'cha & Tayyorlov)</option>
+                <option value="8-11">8 – 11 yosh (Boshlang'ich maktab)</option>
+                <option value="12-16">12 – 16 yosh (O'smirlar)</option>
+              </select>
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Mavzu nomi:</label>
+              <input type="text" id="adminNewTopicTitle" placeholder="Masalan: Quyosh nurlari va fasllar mo'jizasi"
+                     class="w-full p-2.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold outline-none focus:border-indigo-600">
+            </div>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Qisqacha ssenariy tavsifi / yo'riqnoma:</label>
+            <input type="text" id="adminNewTopicPrompt" placeholder="Dars mazmuni haqida qisqa tushuntirish..."
+                   class="w-full p-2.5 rounded-xl border border-slate-200 bg-white text-xs outline-none focus:border-indigo-600">
+          </div>
+          <div class="flex justify-end">
+            <button onclick="handleAdminAddTopic()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-fredoka font-bold text-xs shadow-md transition-all cursor-pointer flex items-center gap-1.5">
+              <span>Saqlash va Tavsiyalarga qo'shish</span> <span>✨</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mavjud mavzular ro'yxati -->
+        <div>
+          <h4 class="font-fredoka font-bold text-sm text-slate-800 mb-3 flex items-center justify-between">
+            <span>📋 Faol Tavsiyaviy Mavzular Ro'yxati</span>
+            <span id="adminTopicsCountBadge" class="text-xs text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full">0 ta</span>
+          </h4>
+          <div id="adminTopicsListContainer" class="space-y-2 max-h-80 overflow-y-auto pr-1">
+            <!-- JS orqali to'ldiriladi -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: Integrations & API Settings -->
+      <div id="adminTabIntegrations" class="space-y-5 hidden">
+        <!-- Sun'iy Intellekt Integratsiyasi (Gemini AI & Mohir AI) -->
+        <div class="p-5 rounded-2xl border border-slate-100 bg-slate-50 space-y-4">
+          <div class="border-b border-slate-200 pb-3">
+            <h4 class="font-fredoka font-bold text-sm text-slate-800 flex items-center gap-1.5">
+              <span>🤖</span> <span>Sun'iy Intellekt Integratsiyasi (Gemini AI & Mohir AI)</span>
+            </h4>
+            <p class="text-[11px] text-slate-500 mt-0.5">Bolalar ta'limiy ssenariylari va o'zbekcha ovoz sintezi (TTS Lola ustoz) API kalitlari</p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">🧠 Google Gemini API Kaliti:</label>
+              <div class="relative">
+                <input type="text" id="adminGeminiApiKey" placeholder="AIzaSy..." style="-webkit-text-security: disc;"
+                       class="w-full p-3 rounded-xl border border-slate-200 bg-white text-xs font-mono outline-none focus:border-indigo-600 pr-10">
+                <button type="button" onclick="toggleKeyVisibility('adminGeminiApiKey', this)" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-sm cursor-pointer" title="Ko'rsatish/Yashirish">👁️</button>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">🎙️ Mohir AI (UzbekVoice) Tokeni:</label>
+              <div class="relative">
+                <input type="text" id="adminMohiraiApiKey" placeholder="91d02f40-..." style="-webkit-text-security: disc;"
+                       class="w-full p-3 rounded-xl border border-slate-200 bg-white text-xs font-mono outline-none focus:border-indigo-600 pr-10">
+                <button type="button" onclick="toggleKeyVisibility('adminMohiraiApiKey', this)" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-sm cursor-pointer" title="Ko'rsatish/Yashirish">👁️</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="p-5 rounded-2xl border border-slate-100 bg-slate-50 space-y-4">
+          <div class="border-b border-slate-200 pb-3">
+            <h4 class="font-fredoka font-bold text-sm text-slate-800 flex items-center gap-1.5">
+              <svg class="w-4 h-4 inline shrink-0" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+              <span>Google Sign-In Integratsiyasi</span>
+            </h4>
+            <p class="text-[11px] text-slate-500 mt-0.5">Google Cloud Console orqali olingan OAuth 2.0 Web Client ID</p>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Google Client ID:</label>
+            <input type="text" id="adminGoogleClientId" placeholder="xxxxxxx-xxxxxxx.apps.googleusercontent.com"
+                   class="w-full p-3 rounded-xl border border-slate-200 bg-white text-xs font-mono outline-none focus:border-indigo-600">
+          </div>
+        </div>
+
+        <div class="p-5 rounded-2xl border border-slate-100 bg-slate-50 space-y-4">
+          <div class="border-b border-slate-200 pb-3">
+            <h4 class="font-fredoka font-bold text-sm text-slate-800 flex items-center gap-1.5">
+              <svg class="w-4 h-4 fill-[#229ED9] shrink-0" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.56 2.94-1.28 4.9-2.12 5.88-2.54 2.8-1.2 3.38-1.41 3.76-1.42.08 0 .28.02.4.12.1.08.13.2.14.28-.01.07-.01.21-.03.37z"/></svg>
+              <span>Telegram Avtorizatsiya Integratsiyasi</span>
+            </h4>
+            <p class="text-[11px] text-slate-500 mt-0.5">@BotFather orqali yaratilgan bot ma'lumotlari</p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Telegram Bot Token:</label>
+              <input type="text" id="adminTgBotToken" placeholder="123456789:ABCdefGHIjkl..."
+                     class="w-full p-3 rounded-xl border border-slate-200 bg-white text-xs font-mono outline-none focus:border-indigo-600">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Bot Foydalanuvchi Nomi (Username):</label>
+              <input type="text" id="adminTgBotUsername" placeholder="tasvirlab_bot"
+                     class="w-full p-3 rounded-xl border border-slate-200 bg-white text-xs outline-none focus:border-indigo-600">
+            </div>
+          </div>
+        </div>
+
+        <!-- To'lov tizimlari sozlamalari -->
+        <div class="p-5 rounded-2xl border border-slate-100 bg-slate-50 space-y-4">
+          <div class="border-b border-slate-200 pb-3">
+            <h4 class="font-fredoka font-bold text-sm text-slate-800 flex items-center gap-1.5">
+              <span>💳</span> <span>To'lov Tizimlari Integratsiyasi (Payme, Click, Uzum, Paynet)</span>
+            </h4>
+            <p class="text-[11px] text-slate-500 mt-0.5">Foydalanuvchilardan to'lovlarni qabul qilish va avtomatik kredit berish sozlamalari</p>
+          </div>
+          <div class="space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Payme Merchant ID:</label>
+                <input type="text" id="adminPaymeMerchantId" placeholder="64a... (Paycom Merchant ID)"
+                       class="w-full p-3 rounded-xl border border-slate-200 bg-white text-xs font-mono outline-none focus:border-indigo-600">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Payme Secret Key:</label>
+                <input type="password" id="adminPaymeSecretKey" placeholder="Paycom kaliti"
+                       class="w-full p-3 rounded-xl border border-slate-200 bg-white text-xs font-mono outline-none focus:border-indigo-600">
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Click Service ID:</label>
+                <input type="text" id="adminClickServiceId" placeholder="12345"
+                       class="w-full p-3 rounded-xl border border-slate-200 bg-white text-xs font-mono outline-none focus:border-indigo-600">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Click Merchant ID:</label>
+                <input type="text" id="adminClickMerchantId" placeholder="67890"
+                       class="w-full p-3 rounded-xl border border-slate-200 bg-white text-xs font-mono outline-none focus:border-indigo-600">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Click Secret Key:</label>
+                <input type="password" id="adminClickSecretKey" placeholder="Click maxfiy kaliti"
+                       class="w-full p-3 rounded-xl border border-slate-200 bg-white text-xs font-mono outline-none focus:border-indigo-600">
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Uzum Merchant ID:</label>
+                <input type="text" id="adminUzumMerchantId" placeholder="uzum_merchant_id"
+                       class="w-full p-3 rounded-xl border border-slate-200 bg-white text-xs font-mono outline-none focus:border-indigo-600">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Uzum Secret Key:</label>
+                <input type="password" id="adminUzumSecretKey" placeholder="Uzum maxfiy kaliti"
+                       class="w-full p-3 rounded-xl border border-slate-200 bg-white text-xs font-mono outline-none focus:border-indigo-600">
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Paynet Service ID:</label>
+                <input type="text" id="adminPaynetServiceId" placeholder="paynet_service_id"
+                       class="w-full p-3 rounded-xl border border-slate-200 bg-white text-xs font-mono outline-none focus:border-indigo-600">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Paynet Secret Key:</label>
+                <input type="password" id="adminPaynetSecretKey" placeholder="Paynet maxfiy kaliti"
+                       class="w-full p-3 rounded-xl border border-slate-200 bg-white text-xs font-mono outline-none focus:border-indigo-600">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-5 rounded-2xl border border-slate-100 bg-slate-50 space-y-4">
+          <div class="border-b border-slate-200 pb-3">
+            <h4 class="font-fredoka font-bold text-sm text-slate-800 flex items-center gap-1.5">
+              <span>🔑</span> <span>Administrator Xavfsizligi</span>
+            </h4>
+            <p class="text-[11px] text-slate-500 mt-0.5">Admin boshqaruv panelining xavfsiz paroli</p>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Yangi Admin Paroli (O'zgartirish uchun):</label>
+            <input type="password" id="adminNewPasswordInput" placeholder="Yangi parolni kiriting (bo'sh qoldirilsa o'zgarmaydi)"
+                   class="w-full p-3 rounded-xl border border-slate-200 bg-white text-xs outline-none focus:border-indigo-600">
+          </div>
+        </div>
+
+        <div class="flex justify-end pt-2">
+          <button onclick="handleAdminSaveIntegrations()" class="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-fredoka font-bold text-xs shadow-md transition-all cursor-pointer flex items-center gap-2">
+            <span>💾</span> <span>Barcha Integratsiya va Sozlamalarni Saqlash</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sahifa Bildirishnomalari (In-Page Toast Container) -->
+  <div id="toastContainer" class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 pointer-events-none max-w-sm w-full px-4 sm:px-0"></div>
+
+  <!-- Sahifa Eslatma Oynasi (In-Page Notice Modal) -->
+  <div id="noticeModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9998] flex items-center justify-center p-4 hidden">
+    <div class="glass-panel p-6 md:p-8 rounded-3xl max-w-md w-full bg-white shadow-2xl space-y-4 border border-slate-100 modal-animate">
+      <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+        <span id="noticeModalIcon" class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl font-bold shadow-sm shrink-0">
+          💡
+        </span>
+        <div>
+          <h4 id="noticeModalTitle" class="font-fredoka font-bold text-lg text-slate-800">Eslatma</h4>
+          <span class="text-[11px] text-slate-400 font-medium">TasvirLab Bildirishnomasi</span>
+        </div>
+      </div>
+      <div id="noticeModalBody" class="text-sm text-slate-600 leading-relaxed whitespace-pre-line py-1">
+        <!-- Xabar matni -->
+      </div>
+      <div class="pt-2 flex justify-end">
+        <button onclick="closeNoticeModal()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-fredoka font-bold text-xs shadow-md transition-all cursor-pointer">
+          Tushundim
         </button>
       </div>
     </div>
   </div>
 
-  <script src="/static/app.js?v=3.2.0"></script>
+  <script src="/static/app.js?v=4.4.0"></script>
 </body>
 </html>
