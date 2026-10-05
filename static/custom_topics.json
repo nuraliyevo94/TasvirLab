@@ -1,0 +1,212 @@
+[
+  {
+    "id": "colors_fun",
+    "age": "2-4",
+    "age_group": "2-4",
+    "title": "Ranglarni birga o'rganamiz",
+    "prompt": "Qizil olma, sariq banan va yashil nok misolida ranglarni quvnoq o'rgatuvchi dars."
+  },
+  {
+    "id": "forest_animals",
+    "age": "2-4",
+    "age_group": "2-4",
+    "title": "O'rmondagi do'stlarimiz",
+    "prompt": "Quyoncha va ayiqvoyning do'stligi hamda o'rmon hayvonlari haqida mayin ertak darsi."
+  },
+  {
+    "id": "magic_polite_words",
+    "age": "2-4",
+    "age_group": "2-4",
+    "title": "Sehrli 'Rahmat' va 'Iltimos' so'zlari",
+    "prompt": "Kichkintoylar uchun shirin muomala, salom berish va rahmat aytish odobi haqida saboq."
+  },
+  {
+    "id": "morning_sunshine",
+    "age": "2-4",
+    "age_group": "2-4",
+    "title": "Quyosh uyg'ondi: Quvnoq ertalab",
+    "prompt": "Ertalab yuvinish, tishlarni tozalash va quvnoq badantarbiya haqida ertak dars."
+  },
+  {
+    "id": "farm_animal_sounds",
+    "age": "2-4",
+    "age_group": "2-4",
+    "title": "Uy hayvonlari va ularning ovozlari",
+    "prompt": "Kuchukcha, mushukcha va qo'zichoq ovozlarini kichkintoylarga tanishtiruvchi saboq."
+  },
+  {
+    "id": "kindness_friends",
+    "age": "5-7",
+    "age_group": "5-7",
+    "title": "Do'stlik va ahillik odobi",
+    "prompt": "Bolalarga do'stlar bilan o'rtoqlashish, samimiy va ahil bo'lish haqida ibratli ertak darsi."
+  },
+  {
+    "id": "autumn_leaves",
+    "age": "5-7",
+    "age_group": "5-7",
+    "title": "Daraxtlar nega barg to'kadi?",
+    "prompt": "Kuz faslida daraxtlar nega barglarini oltin rangga bo'yab to'kishi va qishki uyqusi haqida samimiy dars."
+  },
+  {
+    "id": "water_cycle_intro",
+    "age": "5-7",
+    "age_group": "5-7",
+    "title": "Yomg'ir qayerdan keladi?",
+    "prompt": "Kichik suv tomchisining bulutlarga chiqib, yerga shifobaxsh yomg'ir bo'lib qaytishi haqida saboq."
+  },
+  {
+    "id": "bread_journey",
+    "age": "5-7",
+    "age_group": "5-7",
+    "title": "Non qanday dasturxonga keladi?",
+    "prompt": "Bug'doy donidan issiq va xushbo'y nonga qadar bo'lgan mashaqqatli mehnat haqida hikoya."
+  },
+  {
+    "id": "traffic_lights",
+    "age": "5-7",
+    "age_group": "5-7",
+    "title": "Yo'l harakati qoidalari: Svetofor",
+    "prompt": "Qizil, sariq va yashil chiroqlarning ma'nosi va ko'chani xavfsiz kesib o'tish qoidalari."
+  },
+  {
+    "id": "solar_system",
+    "age": "8-10",
+    "age_group": "8-10",
+    "title": "Quyosh sistemasiga sayohat",
+    "prompt": "Sayyoralar, Quyosh va ularning fazoda aylanish sirlari haqida qiziqarli sayohat."
+  },
+  {
+    "id": "ocean_depths",
+    "age": "8-10",
+    "age_group": "8-10",
+    "title": "Okean tubidagi sirli hayot",
+    "prompt": "Moviy kitlar, rang-barang marjon riflari va dengiz mo'jizalari haqida dars."
+  },
+  {
+    "id": "reading_superpower",
+    "age": "8-10",
+    "age_group": "8-10",
+    "title": "Kitob o'qish qanday kuch beradi?",
+    "prompt": "Kitoblar inson tasavvurini qanday kengaytirishi va allomalar ilmi haqida suhbat."
+  },
+  {
+    "id": "honeybee_wonder",
+    "age": "8-10",
+    "age_group": "8-10",
+    "title": "Asalarilar uyasi va asal mo'jizasi",
+    "prompt": "Asalarilarning intizomi, tabiatni changlatishi va shirin asal tayyorlashi haqida biologik dars."
+  },
+  {
+    "id": "ulughbeg_astronomy",
+    "age": "8-10",
+    "age_group": "8-10",
+    "title": "Mirzo Ulug'bek va yulduzlar jadvali",
+    "prompt": "Samarqand rasadxonasida yulduzlarni xaritaga tushirgan buyuk alloma haqida tarixiy saboq."
+  },
+  {
+    "id": "photosynthesis",
+    "age": "11-12",
+    "age_group": "11-12",
+    "title": "Fotosintez: Yaproq laboratoriyasi",
+    "prompt": "O'simliklar quyosh nuri orqali qanday toza kislorod ishlab chiqarishi va ekologiya sirlari."
+  },
+  {
+    "id": "gravity_secret",
+    "age": "11-12",
+    "age_group": "11-12",
+    "title": "Gravitatsiya kuchi va vaznsizlik",
+    "prompt": "Nega yer narsalarni tortadi va fazogirlar kosmosda qanday suzib yuradi?"
+  },
+  {
+    "id": "human_brain_memory",
+    "age": "11-12",
+    "age_group": "11-12",
+    "title": "Inson miyasi qanday xotirlaydi?",
+    "prompt": "Neyronlar va xotira qanday ishlashi, bilimlarni tez va oson eslab qolish texnikasi."
+  },
+  {
+    "id": "electricity_basics",
+    "age": "11-12",
+    "age_group": "11-12",
+    "title": "Elektr energiyasi qanday hosil bo'ladi?",
+    "prompt": "Gidro va quyosh elektr stansiyalari, elektronlar oqimi va xavfsiz foydalanish."
+  },
+  {
+    "id": "ibn_sina_health",
+    "age": "11-12",
+    "age_group": "11-12",
+    "title": "Ibn Sino: Tabobat va sog'lom hayot",
+    "prompt": "Buyuk tabib Ibn Sinoning to'g'ri ovqatlanish, sport va salomatlik bo'yicha tavsiyalari."
+  },
+  {
+    "id": "cyber_security",
+    "age": "13-15",
+    "age_group": "13-15",
+    "title": "Internetda xavfsizlik: Shaxsiy ma'lumotlarni asrash",
+    "prompt": "Internetda shaxsiy ma'lumotlarni asrash, firibgarlardan himoyalanish va mustahkam parollar tuzish."
+  },
+  {
+    "id": "ai_machine_learning",
+    "age": "13-15",
+    "age_group": "13-15",
+    "title": "Sun'iy intellekt qanday o'rganadi?",
+    "prompt": "Neyrotarmoqlar va sun'iy intellekt ma'lumotlardan qanday o'rganishi va insonlarga yordam berishi."
+  },
+  {
+    "id": "coding_logic_algorithms",
+    "age": "13-15",
+    "age_group": "13-15",
+    "title": "Dasturlash tili va algoritmlar",
+    "prompt": "Algoritmlar mantiqi, ketma-ketlik va kompyuterga buyruq berish san'ati."
+  },
+  {
+    "id": "time_management",
+    "age": "13-15",
+    "age_group": "13-15",
+    "title": "Vaqtni to'g'ri taqsimlash va unumdorlik",
+    "prompt": "O'smirlar uchun darslar va dam olishni to'g'ri rejalashtirish, vaqtni behuda sarflamaslik sirlari."
+  },
+  {
+    "id": "mars_space_exploration",
+    "age": "13-15",
+    "age_group": "13-15",
+    "title": "Kosmik kashfiyotlar va Marsga safar",
+    "prompt": "Mars sayyorasi, qizil tuproqdagi muz izlari va fazogirlarning kelajak rejalari."
+  },
+  {
+    "id": "financial_literacy",
+    "age": "16-19",
+    "age_group": "16-19",
+    "title": "Moliyaviy savodxonlik va shaxsiy byudjet",
+    "prompt": "Pulni oqilona boshqarish, jamg'arma shakllantirish, tejash va birinchi daromadlar."
+  },
+  {
+    "id": "critical_thinking_media",
+    "age": "16-19",
+    "age_group": "16-19",
+    "title": "Tanqidiy fikrlash va yolg'on xabarlarni aniqlash",
+    "prompt": "Axborot oqimida ishonchli manbalarni topish, aldovlarga uchmaslik va mustaqil xulosa chiqarish."
+  },
+  {
+    "id": "future_careers",
+    "age": "16-19",
+    "age_group": "16-19",
+    "title": "Kelajak kasblari va to'g'ri yo'nalish tanlash",
+    "prompt": "Zamonaviy texnologiyalar davrida talab yuqori bo'lgan sohalar, hayotiy qobiliyatlar va kasbiy ko'nikmalar."
+  },
+  {
+    "id": "public_speaking",
+    "age": "16-19",
+    "age_group": "16-19",
+    "title": "Notiqlik san'ati va taqdimot siri",
+    "prompt": "Odamlar oldida ishonchli so'zlash, g'oyalarni chiroyli yetkazish va hayajonni yengish."
+  },
+  {
+    "id": "startup_innovation",
+    "age": "16-19",
+    "age_group": "16-19",
+    "title": "Yangi loyiha va foydali g'oyani boshlash",
+    "prompt": "Muammoni aniqlash, birinchi oddiy namunani yaratish va foydali loyihalarni boshlash qadamlari."
+  }
+]
